@@ -1149,6 +1149,21 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "python-json-logger"
+version = "4.1.0"
+description = "JSON Log Formatter for the Python Logging Package"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "python_json_logger-4.1.0-py3-none-any.whl", hash = "sha256:132994765cf75bf44554be9aa49b06ef2345d23661a96720262716438141b6b2"},
+    {file = "python_json_logger-4.1.0.tar.gz", hash = "sha256:b396b9e3ed782b09ff9d6e4f1683d46c83ad0d35d2e407c09a9ebbf038f88195"},
+]
+
+[package.extras]
+dev = ["black", "build", "freezegun", "mdx_truly_sane_lists", "mike", "mkdocs", "mkdocs-awesome-pages-plugin", "mkdocs-gen-files", "mkdocs-literate-nav", "mkdocs-material (>=8.5)", "mkdocstrings[python]", "msgspec ; implementation_name != \"pypy\"", "mypy", "orjson ; implementation_name != \"pypy\"", "pylint", "pytest", "tzdata", "validate-pyproject[all]"]
+
+[[package]]
 name = "ruff"
 version = "0.6.1"
 description = "An extremely fast Python linter and code formatter, written in Rust."
@@ -1346,4 +1361,4 @@ standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "0f372c8d1b0e5eb8a8a2acd58804d99f738c1b9edf7a3fe6b7e41af1ce83d8c8"
+content-hash = "b7cb00e17f8af4f03cb2769acab363ad3c64feb892d2fe85de8304ad56f90a23"
