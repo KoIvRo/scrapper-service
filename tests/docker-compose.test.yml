@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: project
+    ports:
+      - "5432:5432"
+    networks:
+      - test-network
+
+  bot:
+    build: ../bot
+    environment:
+      SCRAPPER_URL: http://scrapper:8001
+    ports:
+      - "8000:8000"
+    networks:
+      - test-network
+    depends_on:
+      - postgres
+
+  scrapper:
+    build: ../scrapper
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: project
+      BOT_URL: http://bot:8000
+      access_type: raw # orm, raw
+    ports:
+      - "8001:8001"
+    networks:
+      - test-network
+    depends_on:
+      - postgres
+
+networks:
+  test-network:
+    driver: bridge

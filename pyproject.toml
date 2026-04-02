@@ -1,14 +1,24 @@
 [tool.poetry]
-name = "backend-academy-2026-python-template"
+name = "scrapper-monorepo"
 version = "0.1.0"
 description = ""
 package-mode = false
-authors = ["g.tarasov <g.tarasov@tbank.ru>"]
+authors = ["i.korotaev"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
-
+python = ">=3.12,<3.15"
+fastapi = "^0.135.1"
+pydantic = "^2.12.5"
+pydantic-settings = "^2.13.1"
+httpx = "^0.28.1"
+uvicorn = "^0.41.0"
+asyncpg = "^0.31.0"
+sqlalchemy = "^2.0.48"
+alembic = "^1.18.4"
+aiogram = "^3.25.0"
+pytest-asyncio = "^1.3.0"
+requests = "^2.32.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
