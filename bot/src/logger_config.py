@@ -1,34 +1,24 @@
 import logging
-from logging import Logger
+from pythonjsonlogger import jsonlogger
+from config import settings
 
 
-def setup_logger(name: str) -> Logger:
-    """Настройка логгера."""
+def init_logger() -> None:
+    """Настройка логгера ВЫЗЫВАТЬ ПРИ СТАРТЕ."""
+    logger = logging.getLogger()
+    formatter = jsonlogger.JsonFormatter(
+        '%(asctime)s %(levelname)s %(name)s %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
 
-    class ExtraFormatter(logging.Formatter):
-        def format(self, record):
-            base_msg = super().format(record)
-
-            extra = []
-            if hasattr(record, "user_id"):
-                extra.append(f"user_id={record.user_id}")
-            if hasattr(record, "username"):
-                extra.append(f"username={record.username}")
-            if hasattr(record, "command"):
-                extra.append(f"command={record.command}")
-
-            if extra:
-                return f"{base_msg} {' '.join(extra)}"
-            return base_msg
-
-    formatter = ExtraFormatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
-
-    logging.basicConfig(level=logging.INFO, handlers=[handler])
+    if settings.logger_output == "stdout":
+        log_handler = logging.StreamHandler()
+    else:
+        log_handler = logging.FileHandler(settings.logger_output, encoding="utf-8")
+    
+    log_handler.setFormatter(formatter)
+    logger.addHandler(log_handler)
+    logger.setLevel(settings.logger_level)
 
     logging.getLogger("aiogram").setLevel(logging.WARNING)
     logging.getLogger("aiohttp").setLevel(logging.WARNING)
-
-    return logging.getLogger(name)

@@ -5,10 +5,10 @@ from routes.untrack import untrack
 from routes.list import list_command
 from routes.commands import setup_bot_commands
 from aiogram import Bot, Dispatcher
-from logger_config import setup_logger
 from typing import Optional
+import logging
 
-logger = setup_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class BotFactory:
@@ -25,7 +25,7 @@ class BotFactory:
         if not self._bot:
             self._bot = Bot(token=settings.bot_token.get_secret_value())
             logger.info(
-                "Бот создан",
+                "Bot created",
             )
 
         return self._bot
@@ -48,7 +48,7 @@ class BotFactory:
             await setup_bot_commands(self.get_bot())
             self._is_setup = True
             logger.info(
-                "Команды установленны",
+                "Commands installed",
             )
 
 

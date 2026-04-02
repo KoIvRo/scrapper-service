@@ -3,10 +3,10 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from functools import wraps
 from exceptions import DataBaseError
-from logger_config import setup_logger
 from typing import Callable, Any
+import logging
 
-logger = setup_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def db_error_handler(func: Callable) -> Callable:
@@ -15,7 +15,7 @@ def db_error_handler(func: Callable) -> Callable:
         try:
             return await func(*args, **kwargs)
         except Exception as e:
-            logger.warning(f"Ошибка в работе базы данных: {e}")
+            logger.warning(f"Data Base error", extra={"error": e})
             raise DataBaseError(e) from e
 
     return wrapper

@@ -2,10 +2,10 @@ import httpx
 from typing import Optional
 from .base_notifier import BaseNotifier
 from models.dto.schemas import LinkUpdate
-from logger_config import setup_logger
+import logging
 
 
-logger = setup_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class BotNotifier(BaseNotifier):
@@ -37,4 +37,4 @@ class BotNotifier(BaseNotifier):
 
         await client.post(f"{self._bot_url}/updates", json=link_update.model_dump())
 
-        logger.info(f"Отправлено уведомлние о обновлении ссылки: {link_update.url}")
+        logger.info("Link update notification sent", extra={"url": link_update.url})

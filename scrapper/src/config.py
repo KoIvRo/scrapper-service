@@ -20,6 +20,9 @@ class Settings(BaseSettings):
 
     github_token: Optional[SecretStr] = None
 
+    logger_level: str = "INFO"
+    logger_output: str = "stdout"
+
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
     )

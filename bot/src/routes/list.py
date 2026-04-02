@@ -5,13 +5,13 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from .states import ListStates
-from logger_config import setup_logger
 from constants.messages import TrackMessages
 from dependencies.client_factory import get_client
 from models.schemas import ListLinksResponse, LinkResponse
 from constants.messages import ListMessages
+import logging
 
-logger = setup_logger(__name__)
+logger = logging.getLogger(__name__)
 list_command = Router()
 
 
@@ -33,6 +33,15 @@ def build_pagination_kb(
 
 @list_command.message(Command("list"))
 async def track_list(message: Message, state: FSMContext) -> None:
+    """Обработка команды /list."""
+    logger.info(
+        "The /list command was received",
+        extra={
+            "user_id": message.from_user.id,
+            "username": message.from_user.username,
+        },
+    )
+
     page = 0
     limit = 5
     tag = _extract_tag(message.text)
@@ -60,11 +69,20 @@ async def track_list(message: Message, state: FSMContext) -> None:
 
 @list_command.callback_query(ListStates.waiting_for_command)
 async def waiting_for_command(callback: CallbackQuery, state: FSMContext) -> None:
+    """Состояние пагинации."""
     data = await state.get_data()
 
     page = data["page"]
     limit = data["limit"]
     tag = data.get("tag")
+
+    logger.info(
+        "The /list command was received",
+        extra={
+            "page": page,
+            "limit": limit,
+        },
+    )
 
     if callback.data == "cancel":
         await state.clear()

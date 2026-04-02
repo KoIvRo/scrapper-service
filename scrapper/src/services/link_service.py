@@ -11,11 +11,11 @@ from exceptions import (
     InvalidLimit,
     InvalidPage,
 )
-from logger_config import setup_logger
 from datetime import datetime
+import logging
 
 
-logger = setup_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class LinkService(BaseService):
@@ -33,7 +33,7 @@ class LinkService(BaseService):
         """Получение списка ссылок пагинированно."""
 
         if not await self._exist_chat(chat_id):
-            logger.warning(f"Попытка взять ссылки несуществующего чата: {chat_id}")
+            logger.warning("Attempt to take links from a non-existent chat", extra={"chat_id": chat_id})
             raise UnknownChatError(chat_id)
 
         self._validate_pagination(page, limit)
@@ -58,7 +58,7 @@ class LinkService(BaseService):
         """Удалить чат."""
 
         if not (await self._exist_chat(chat_id)):
-            logger.warning(f"Попытка удалить несуществующий чат {chat_id}")
+            logger.warning("Attempt to delete non-existent chat", extra={"chat_id": chat_id})
             raise UnknownChatError(chat_id)
 
         await self._repo.delete_chat(chat_id)
@@ -69,11 +69,11 @@ class LinkService(BaseService):
         """Добавление ссылки."""
 
         if not self._validate_url(url):
-            logger.warning(f"Попытка добавить невалидный url: {url}")
+            logger.warning("Attempt to add invalid url", extra={"url": url})
             raise InvalidURL(url)
 
         if await self._exist_link(chat_id, url):
-            logger.warning(f"Попытка добавить существующий url: {url}, chat: {chat_id}")
+            logger.warning("Attempt to add existing url", extra={"url": url, "chat_id": chat_id})
             raise ExistLink(url)
 
         return await self._repo.append_link(chat_id, url, tags)
@@ -82,7 +82,7 @@ class LinkService(BaseService):
         """Удаление ссылки"""
 
         if not await self._exist_link(chat_id, url):
-            logger.warning(f"Попытка удалить несуществующий url: {url}")
+            logger.warning("Attempt to delete non-existent url", extra={"url": url})
             raise UnknownLink(url)
 
         return await self._repo.delete_link(chat_id, url)
@@ -115,11 +115,11 @@ class LinkService(BaseService):
     def _validate_pagination(self, page: int, limit: int) -> None:
         """Валидируем пагинацию."""
         if not self._validate_page(page):
-            logger.warning(f"Неверный формат page: {page}")
+            logger.warning("Invalid page format", extra={"page": page})
             raise InvalidPage(page)
 
         if not self._validate_limit(limit):
-            logger.warning(f"Неверный формат limit: {limit}")
+            logger.warning("Invalid limit format", extra={"limit": limit})
             raise InvalidLimit(limit)
 
     @staticmethod

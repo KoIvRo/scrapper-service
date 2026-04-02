@@ -3,12 +3,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
 from aiogram.types import Message
 from .states import UntrackStates
-from logger_config import setup_logger
 from constants.messages import UntrackMessages
 from dependencies.client_factory import get_client
+import logging
 
 untrack = Router()
-logger = setup_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @untrack.message(Command("untrack"))
@@ -16,7 +16,7 @@ async def start_untrack(message: Message, state=FSMContext) -> None:
     """Обработчик команды /untrack."""
 
     logger.info(
-        "Поступила команда /untrack.",
+        "The /track command was received.",
         extra={
             "user_id": message.from_user.id,
             "username": message.from_user.username,
@@ -32,7 +32,7 @@ async def waiting_for_links(message: Message, state=FSMContext) -> None:
     """Обработка состояния ожидания ссылки."""
 
     logger.info(
-        "Ожидание ссылки на удаление.",
+        "Waiting link for delete.",
         extra={
             "user_id": message.from_user.id,
             "username": message.from_user.username,

@@ -2,13 +2,9 @@ import asyncpg
 from typing import Optional
 from pydantic import HttpUrl
 from datetime import datetime
-from logger_config import setup_logger
 from contextlib import asynccontextmanager
 from .base_repository import BaseRepository, db_error_handler
 from models.dto.schemas import Link, GlobalLink, PaginatedLink
-
-
-logger = setup_logger(__name__)
 
 
 class ChatQueryies:

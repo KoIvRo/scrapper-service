@@ -10,6 +10,7 @@ from scheduler import Scheduler
 from dependencies.service_factory import get_service
 from dependencies.notifier_factory import get_notifier
 from dependencies.client_factory import get_all_clients
+from logger_config import init_logger
 
 
 sys.path.append(str(Path(__file__).parent))
@@ -46,4 +47,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
+    init_logger()
     asyncio.run(main())

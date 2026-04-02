@@ -1,13 +1,13 @@
 import asyncio
 from typing import Optional
 from datetime import datetime
-from logger_config import setup_logger
 from clients.base_client import BaseClient
 from services.base_service import BaseService
 from notifier.base_notifier import BaseNotifier
 from models.dto.schemas import GlobalLink, LinkUpdate, PaginatedLink
+import logging
 
-logger = setup_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class Scheduler:
@@ -34,7 +34,7 @@ class Scheduler:
         """Запуск"""
         self._running = True
 
-        logger.info("Scheduler запущен.")
+        logger.info("Scheduler started.")
 
         while self._running:
             try:
@@ -45,7 +45,7 @@ class Scheduler:
                 elapsed = asyncio.get_event_loop().time() - start
                 await asyncio.sleep(max(0, self._update_time - elapsed))
             except Exception as e:
-                logger.critical(f"Ошибка scheduler: {e}")
+                logger.critical(f"Scheduler error: {e}")
 
     async def stop(self) -> None:
         """Остановить scheduler."""
@@ -67,7 +67,7 @@ class Scheduler:
             links_to_notify = await self._get_links_for_notify(batch.items)
 
             if links_to_notify:
-                logger.info(f"Найдено {len(links_to_notify)} ссылок для обновления.")
+                logger.info(f"Find {len(links_to_notify)} links for update.")
                 await self._send_update(links_to_notify)
 
             if not batch.has_next:
@@ -114,7 +114,7 @@ class Scheduler:
             try:
                 new_date = await client.get_last_update(str(link.url))
             except Exception as e:
-                logger.warning(f"Ошибка клиента для {link.url}: {e}")
+                logger.warning(f"Client error", extra={"error": e, "url": str(link.url)})
                 return None
 
             if not new_date:

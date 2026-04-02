@@ -2,15 +2,15 @@ from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.filters import Command
-from logger_config import setup_logger
 from .states import TrackStates
 from constants.messages import TrackMessages
 from dependencies.client_factory import get_client
 from pydantic import HttpUrl, ValidationError
+import logging
 
 
 track = Router()
-logger = setup_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @track.message(Command("track"))
@@ -18,7 +18,7 @@ async def start_track(message: Message, state=FSMContext) -> None:
     """Обработчик команды /track."""
 
     logger.info(
-        "Поступила команда /track.",
+        "The /track command was received",
         extra={
             "user_id": message.from_user.id,
             "username": message.from_user.username,
@@ -44,7 +44,7 @@ async def waiting_for_links(message: Message, state=FSMContext) -> None:
     """Состояние ожидания ссылки."""
 
     logger.info(
-        "Ожидание ссылки.",
+        "Waiting link for append",
         extra={
             "user_id": message.from_user.id,
             "username": message.from_user.username,
@@ -74,7 +74,7 @@ async def waiting_for_tags(message: Message, state=FSMContext) -> None:
     """Состояние ожидания тегов."""
 
     logger.info(
-        "Ожидание тегов.",
+        "Waiting for tags",
         extra={
             "user_id": message.from_user.id,
             "username": message.from_user.username,

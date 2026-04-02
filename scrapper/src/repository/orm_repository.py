@@ -1,16 +1,11 @@
 from models.dto.schemas import Link, GlobalLink, PaginatedLink
 from models.orm.schemas import Chat, Link as LinkORM, Tag, ChatLink, ChatLinkTag
 from pydantic import HttpUrl
-from logger_config import setup_logger
 from .base_repository import BaseRepository, db_error_handler
 from datetime import datetime
-
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy import select, update, delete, func, exists
 from sqlalchemy.dialects.postgresql import insert
-
-
-logger = setup_logger(__name__)
 
 
 class OrmRepository(BaseRepository):
