@@ -13,6 +13,7 @@ sys.path.append(str(Path(__file__).parent))
 app = FastAPI()
 app.include_router(update)
 
+
 async def run_api() -> None:
     """Запуск веб сервера."""
     config = uvicorn.Config(app, host=settings.host, port=settings.port)

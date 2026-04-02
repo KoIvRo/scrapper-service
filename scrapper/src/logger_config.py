@@ -7,15 +7,14 @@ def init_logger() -> None:
     """Настройка логгера ВЫЗЫВАТЬ ПРИ СТАРТЕ."""
     logger = logging.getLogger()
     formatter = jsonlogger.JsonFormatter(
-        '%(asctime)s %(levelname)s %(name)s %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        "%(asctime)s %(levelname)s %(name)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
     )
 
     if settings.logger_output == "stdout":
         log_handler = logging.StreamHandler()
     else:
         log_handler = logging.FileHandler(settings.logger_output, encoding="utf-8")
-    
+
     log_handler.setFormatter(formatter)
     logger.addHandler(log_handler)
     logger.setLevel(settings.logger_level)

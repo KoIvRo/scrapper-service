@@ -33,7 +33,10 @@ class LinkService(BaseService):
         """Получение списка ссылок пагинированно."""
 
         if not await self._exist_chat(chat_id):
-            logger.warning("Attempt to take links from a non-existent chat", extra={"chat_id": chat_id})
+            logger.warning(
+                "Attempt to take links from a non-existent chat",
+                extra={"chat_id": chat_id},
+            )
             raise UnknownChatError(chat_id)
 
         self._validate_pagination(page, limit)
@@ -58,7 +61,9 @@ class LinkService(BaseService):
         """Удалить чат."""
 
         if not (await self._exist_chat(chat_id)):
-            logger.warning("Attempt to delete non-existent chat", extra={"chat_id": chat_id})
+            logger.warning(
+                "Attempt to delete non-existent chat", extra={"chat_id": chat_id}
+            )
             raise UnknownChatError(chat_id)
 
         await self._repo.delete_chat(chat_id)
@@ -73,7 +78,9 @@ class LinkService(BaseService):
             raise InvalidURL(url)
 
         if await self._exist_link(chat_id, url):
-            logger.warning("Attempt to add existing url", extra={"url": url, "chat_id": chat_id})
+            logger.warning(
+                "Attempt to add existing url", extra={"url": url, "chat_id": chat_id}
+            )
             raise ExistLink(url)
 
         return await self._repo.append_link(chat_id, url, tags)

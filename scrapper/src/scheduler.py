@@ -57,9 +57,9 @@ class Scheduler:
         page = 0
 
         while True:
-            batch: PaginatedLink[GlobalLink] = (
-                await self._service.get_all_links_paginated(page, self._batch_size)
-            )
+            batch: PaginatedLink[
+                GlobalLink
+            ] = await self._service.get_all_links_paginated(page, self._batch_size)
 
             if not batch.items:
                 break
@@ -114,7 +114,9 @@ class Scheduler:
             try:
                 new_date = await client.get_last_update(str(link.url))
             except Exception as e:
-                logger.warning(f"Client error", extra={"error": e, "url": str(link.url)})
+                logger.warning(
+                    f"Client error", extra={"error": e, "url": str(link.url)}
+                )
                 return None
 
             if not new_date:
