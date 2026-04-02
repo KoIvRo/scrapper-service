@@ -1,0 +1,32 @@
+image: python:3.12-slim
+
+variables:
+  P_LANG: "python" # Default value, may be overridden via GitLab CI/CD UI
+
+stages:
+  - pre
+  - lint_tests
+
+show_variables:
+  stage: pre
+  script:
+    - printenv | sort
+
+Run linters and tests:
+  stage: lint_tests
+  variables:
+    POETRY_HOME: "/opt/poetry"
+    POETRY_VIRTUALENVS_IN_PROJECT: true
+    POETRY_NO_INTERACTION: 1
+    PYTHONUNBUFFERED: 1
+    PYTHONDONTWRITEBYTECODE: 1
+  script:
+    - export PATH="$POETRY_HOME/bin:$PATH"
+    - apt-get update && apt-get install -y curl
+    - curl -sSL https://install.python-poetry.org | python -
+    - poetry install --no-root --with dev
+    - poetry run black --check .
+    - poetry run ruff check --output-format=github --target-version=py312
+    - poetry run mypy .
+    - poetry run pytest tests --dead-fixtures --dup-fixtures
+    - poetry run pytest tests --cov=src --cov-report=xml

@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "backend-academy-2026-python-template"
+version = "0.1.0"
+description = ""
+package-mode = false
+authors = ["g.tarasov <g.tarasov@tbank.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.15"
+aiogram = "^3.25.0"
+pydantic-settings = "^2.13.1"
+pytest-asyncio = "^1.3.0"
+requests = "^2.32.5"
+fastapi = "^0.135.1"
+httpx = "^0.28.1"
+uvicorn = "^0.41.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+isort = "^5.13.2"
+ruff = "^0.6.1"
+pytest = "*"
+pytest-cov = "*"
+pytest-deadfixtures = "*"
+pytest-mock = "*"
+pytest-repeat = "*"
+pytest-asyncio = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
