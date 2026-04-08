@@ -4,10 +4,10 @@ help: ## Show this help
 
 .PHONY: lint
 lint: ## Run linters in format mode
-	black ./src ./tests
-	mypy ./src
-	ruff check ./src ./tests
-	pytest ./tests --dead-fixtures --dup-fixtures 
+	black ./bot/src ./bot/tests ./scrapper/src ./scrapper/tests
+	mypy ./scrapper/src ./scrapper/tests
+	ruff check ./bot/src ./bot/tests ./scrapper/src ./scrapper/tests
+	pytest ./bot/tests ./scrapper/tests --dead-fixtures --dup-fixtures 
 
 .PHONY: test
 test: ## Runs pytest with coverage

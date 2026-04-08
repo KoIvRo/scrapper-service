@@ -10,6 +10,8 @@ def init_logger() -> None:
         "%(asctime)s %(levelname)s %(name)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
     )
 
+    log_handler: logging.Handler
+
     if settings.logger_output == "stdout":
         log_handler = logging.StreamHandler()
     else:

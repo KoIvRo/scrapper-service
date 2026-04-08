@@ -1,8 +1,8 @@
 import httpx
 from typing import Optional
-from datetime import datetime
 from abc import ABC, abstractmethod
 from validators.validators import BaseUrlValidator
+from models.dto.schemas import BaseEvent
 
 
 class BaseClient(ABC):
@@ -29,7 +29,7 @@ class BaseClient(ABC):
         return self._client
 
     @abstractmethod
-    async def get_last_update(self, url: str) -> Optional[datetime]:
+    async def get_last_event(self, url: str) -> Optional[BaseEvent]:
         """Получение времени последнего апдейта."""
         pass
 

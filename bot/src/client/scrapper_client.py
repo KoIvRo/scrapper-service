@@ -65,7 +65,11 @@ class ScrapperClient:
 
         client = await self._get_client()
 
-        payload = {"link": url, "tags": tags or [], "filters": []}  # пока не используем
+        payload: dict[str, str | list] = {
+            "link": url,
+            "tags": tags or [],
+            "filters": [],
+        }  # пока не используем
 
         try:
             response = await client.post(

@@ -2,6 +2,7 @@ from httpx import Response
 from typing import Optional
 from datetime import datetime
 from .base_client import BaseClient
+from models.dto.schemas import GitHubEvent
 from validators.validators import GitHubUrlValidator
 
 
@@ -12,7 +13,7 @@ class GitHubClient(BaseClient):
         super().__init__(base_url="https://api.github.com", validator=validator)
         self._token = token
 
-    async def get_last_update(self, url: str) -> Optional[datetime]:
+    async def get_last_event(self, url: str) -> Optional[GitHubEvent]:
         """Получение времени последнего апдейта."""
 
         owner, repo = self._parse_url(url)
@@ -23,24 +24,46 @@ class GitHubClient(BaseClient):
             "Authorization": f"token {self._token}",
         }
 
+        params: dict[str, str | int] = {
+            "state": "all",
+            "sort": "created",
+            "direction": "desc",
+            "per_page": 1,
+        }
+
         response = await client.get(
-            f"{self.base_url}/repos/{owner}/{repo}", headers=headers
+            f"{self.base_url}/repos/{owner}/{repo}/issues",
+            headers=headers,
+            params=params,
         )
 
         if response.status_code == 200:
-            updated_at = self._parse_response(response)
+            update = self._parse_response(response)
+            return update
 
-            if updated_at:
-                return updated_at
         return None
 
-    def _parse_response(self, response: Response) -> Optional[datetime]:
+    def _parse_response(self, response: Response) -> Optional[GitHubEvent]:
         """Получение даты обновления из ответа."""
-        data: dict = response.json()
-        updated_at: Optional[str] = data.get("updated_at", None)
-        if updated_at:
-            return datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
-        return None
+        data: list = response.json()
+
+        if not data:
+            return None
+
+        item: dict = data[0]
+
+        updated_at = item.get("updated_at", None)
+        if not updated_at:
+            return None
+        updated_at = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
+
+        return GitHubEvent(
+            url=item.get("html_url", ""),
+            title=item.get("title", ""),
+            author=item.get("user", {}).get("login", ""),
+            updated_at=updated_at,
+            preview=(item.get("body") or "")[:200],
+        )
 
     def validate_url(self, url: str) -> bool:
         """Проверка подходящий ли url."""

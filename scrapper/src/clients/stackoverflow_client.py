@@ -11,7 +11,7 @@ class StackOverFlowClient(BaseClient):
     def __init__(self, validator: StackOverFlowUrlValidator) -> None:
         super().__init__(base_url="https://api.stackexchange.com", validator=validator)
 
-    async def get_last_update(self, url: str) -> Optional[datetime]:
+    async def get_last_event(self, url: str) -> Optional[datetime]:
         """Получение последнего обновления."""
 
         client = await self._get_client()

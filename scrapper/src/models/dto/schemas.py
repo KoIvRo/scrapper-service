@@ -18,6 +18,57 @@ class PaginatedLink(Generic[T]):
         return len(self.items)
 
 
+@dataclass
+class BaseEvent:
+    """Объект хранит информацию о событий."""
+
+    url: str  # Ссылка на событие
+    updated_at: datetime
+    title: str
+    author: str
+    preview: str
+
+    def __str__(self) -> str:
+        """Сообщение об изменениях на GitHub."""
+        message = ""
+
+        if self.url:
+            message += f"Ссылка: {self.url}\n"
+        if self.updated_at:
+            message += f"Обновление: {self.updated_at}\n"
+        if self.author:
+            message += f"Автор: {self.author}\n"
+        if self.title:
+            message += f"Заголовок: {self.title}"
+        if self.preview:
+            message += f"Описание: {self.preview}"
+
+        return message
+
+
+@dataclass
+class GitHubEvent(BaseEvent):
+    """Объект хранит информацию о изменении ссылки с github."""
+
+    pass
+
+
+@dataclass
+class StackOverFlowEvent(BaseEvent):
+    """Объект хранит информация о изменении ссылки stackoverflow."""
+
+    pass
+
+
+@dataclass
+class LinkEvent:
+    """Событие связанное с ссылкой."""
+
+    link_id: int
+    url: HttpUrl  # Ссылка, которая отслеживается
+    event: BaseEvent
+
+
 class GlobalLink(BaseModel):
     """Глобальная хранящаяся ссылка без учета чатов, используется scheduler."""
 

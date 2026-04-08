@@ -4,7 +4,7 @@ from datetime import datetime
 from clients.base_client import BaseClient
 from services.base_service import BaseService
 from notifier.base_notifier import BaseNotifier
-from models.dto.schemas import GlobalLink, LinkUpdate, PaginatedLink
+from models.dto.schemas import GlobalLink, LinkUpdate, PaginatedLink, LinkEvent
 import logging
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class Scheduler:
 
         while self._running:
             try:
-                start = asyncio.get_event_loop().time()
+                start = asyncio.get_running_loop().time()
 
                 await self._check_all_links()
 
@@ -57,9 +57,9 @@ class Scheduler:
         page = 0
 
         while True:
-            batch: PaginatedLink[
-                GlobalLink
-            ] = await self._service.get_all_links_paginated(page, self._batch_size)
+            batch: PaginatedLink[GlobalLink] = (
+                await self._service.get_all_links_paginated(page, self._batch_size)
+            )
 
             if not batch.items:
                 break
@@ -75,20 +75,17 @@ class Scheduler:
 
             page += 1
 
-    async def _send_update(self, links: list[GlobalLink]) -> None:
+    async def _send_update(self, link_events: list[LinkEvent]) -> None:
         """Подготовить Update."""
         updates: list[LinkUpdate] = []
 
-        for link in links:
-            chats = await self._service.get_chats_for_link(link.id)
-
-            updated_at = link.updated_at
-            updated_str = updated_at.strftime("%Y-%m-%d %H:%M:%S") if updated_at else ""
+        for link in link_events:
+            chats = await self._service.get_chats_for_link(link.link_id)
 
             updates.append(
                 LinkUpdate(
-                    id=link.id,
-                    description=f"Ссылка: {link.url}\nОбновление в {updated_str}",
+                    id=link.link_id,
+                    description=str(link.event),
                     url=str(link.url),
                     tgChatIds=chats,
                 )
@@ -97,14 +94,14 @@ class Scheduler:
         if updates:
             await self._notifier.notify(updates)
 
-    async def _get_links_for_notify(self, links: list[GlobalLink]) -> list[GlobalLink]:
+    async def _get_links_for_notify(self, links: list[GlobalLink]) -> list[LinkEvent]:
         tasks = [self._check_single_link(link) for link in links]
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        return [r for r in results if isinstance(r, GlobalLink)]
+        return [r for r in results if isinstance(r, LinkEvent)]
 
-    async def _check_single_link(self, link: GlobalLink) -> Optional[GlobalLink]:
+    async def _check_single_link(self, link: GlobalLink) -> Optional[LinkEvent]:
         async with self._sem:
             client = self._select_client(str(link.url))
 
@@ -112,20 +109,19 @@ class Scheduler:
                 return None
 
             try:
-                new_date = await client.get_last_update(str(link.url))
+                event = await client.get_last_event(str(link.url))
             except Exception as e:
                 logger.warning(
                     f"Client error", extra={"error": e, "url": str(link.url)}
                 )
                 return None
 
-            if not new_date:
+            if not event:
                 return None
 
-            if self._needs_update(link, new_date):
-                await self._service.update_link_timestamp(link.id, new_date)
-                link.updated_at = new_date
-                return link
+            if self._needs_update(link, event.updated_at):
+                await self._service.update_link_timestamp(link.id, event.updated_at)
+                return LinkEvent(link_id=link.id, event=event, url=str(link.url))
 
             return None
 
