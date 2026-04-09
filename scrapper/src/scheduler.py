@@ -5,6 +5,7 @@ from clients.base_client import BaseClient
 from services.base_service import BaseService
 from notifier.base_notifier import BaseNotifier
 from models.dto.schemas import GlobalLink, LinkUpdate, PaginatedLink, LinkEvent
+from config import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,9 +19,9 @@ class Scheduler:
         service: BaseService,
         clients: list[BaseClient],
         notifier: BaseNotifier,
-        update_time: int = 10,
-        batch_size: int = 100,
-        concurrency: int = 20,
+        update_time: int = settings.update_time,
+        batch_size: int = settings.batch_size,
+        concurrency: int = settings.concurrency_links,
     ) -> None:
         self._service = service
         self._clients = clients
