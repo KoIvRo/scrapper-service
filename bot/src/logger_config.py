@@ -1,12 +1,12 @@
 import logging
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger.json import JsonFormatter
 from config import settings
 
 
 def init_logger() -> None:
     """Настройка логгера ВЫЗЫВАТЬ ПРИ СТАРТЕ."""
     logger = logging.getLogger()
-    formatter = jsonlogger.JsonFormatter(
+    formatter = JsonFormatter(
         "%(asctime)s %(levelname)s %(name)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
     )
 

@@ -57,9 +57,9 @@ class Scheduler:
         page = 0
 
         while True:
-            batch: PaginatedLink[
-                GlobalLink
-            ] = await self._service.get_all_links_paginated(page, self._batch_size)
+            batch: PaginatedLink[GlobalLink] = (
+                await self._service.get_all_links_paginated(page, self._batch_size)
+            )
 
             if not batch.items:
                 break

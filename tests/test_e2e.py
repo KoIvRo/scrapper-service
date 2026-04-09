@@ -8,8 +8,6 @@ from pathlib import Path
 
 @pytest.fixture(scope="module")
 def docker_services():
-    """Запуск всей системы через docker-compose.test.yml"""
-
     compose_path = Path(__file__).parent
 
     with DockerCompose(
@@ -57,7 +55,7 @@ async def test_add_link(docker_services):
         assert r.status_code in (200, 201)
 
         r2 = await client.get(
-            f"{scrapper_url}/links/?page=0&limit=1",
+            f"{scrapper_url}/links/?page=0&limit=10",
             headers={"Tg-Chat-Id": "123"},
         )
 
@@ -93,9 +91,76 @@ async def test_delete_link(docker_services):
         assert r.status_code == 200
 
         r2 = await client.get(
-            f"{scrapper_url}/links/?page=0&limit=1",
+            f"{scrapper_url}/links/?page=0&limit=10",
             headers={"Tg-Chat-Id": "123"},
         )
 
         assert r2.status_code == 200
         assert url not in str(r2.json())
+
+
+@pytest.mark.asyncio
+async def test_multiple_links(docker_services):
+    scrapper_url = docker_services["scrapper_url"]
+
+    links = [
+        "https://github.com/user/repo1",
+        "https://github.com/user/repo2",
+        "https://github.com/user/repo3",
+    ]
+
+    async with httpx.AsyncClient() as client:
+        await client.post(f"{scrapper_url}/tg-chat/123")
+
+        for link in links:
+            await client.post(
+                f"{scrapper_url}/links",
+                headers={"Tg-Chat-Id": "123"},
+                json={"link": link, "tags": ["multi"]},
+            )
+
+        r = await client.get(
+            f"{scrapper_url}/links/?page=0&limit=10",
+            headers={"Tg-Chat-Id": "123"},
+        )
+
+        assert r.status_code == 200
+        data = r.json()
+
+        for link in links:
+            assert link in str(data)
+
+
+@pytest.mark.asyncio
+async def test_invalid_url_rejected(docker_services):
+    scrapper_url = docker_services["scrapper_url"]
+
+    async with httpx.AsyncClient() as client:
+        await client.post(f"{scrapper_url}/tg-chat/123")
+
+        r = await client.post(
+            f"{scrapper_url}/links",
+            headers={"Tg-Chat-Id": "123"},
+            json={"link": "not-a-url", "tags": ["fail"]},
+        )
+
+        assert r.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_empty_links_list(docker_services):
+    scrapper_url = docker_services["scrapper_url"]
+
+    async with httpx.AsyncClient() as client:
+        await client.post(f"{scrapper_url}/tg-chat/999")
+
+        r = await client.get(
+            f"{scrapper_url}/links/?page=0&limit=10",
+            headers={"Tg-Chat-Id": "999"},
+        )
+
+        assert r.status_code == 200
+        data = r.json()
+
+        assert "links" in data
+        assert len(data["links"]) == 0

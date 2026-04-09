@@ -59,7 +59,7 @@ class StackOverFlowClient(BaseClient):
             question_data = self._parse_questions_response(response_questions)
             return StackOverFlowEvent(
                 title=question_data.get("title", ""),
-                url=question_data.get("link", ""),
+                url=question_data.get("url", ""),
                 author=answers_data.get("author", ""),
                 preview=answers_data.get("preview", ""),
                 updated_at=answers_data.get("updated_at", ""),
@@ -67,18 +67,12 @@ class StackOverFlowClient(BaseClient):
 
         return None
 
-    def _parse_answers_response(
-        self, response_answers: Response
-    ) -> Optional[AnswersData]:
+    def _parse_answers_response(self, response_answers: Response) -> AnswersData:
         """Парсинг ответов."""
         data_answers: dict = response_answers.json()
         items_answers = data_answers.get("items", [])
-        if not items_answers:
-            return None
         item_answers = items_answers[0]
         created_ts = item_answers.get("creation_date", None)
-        if not created_ts:
-            return None
         created_at = datetime.fromtimestamp(created_ts, tz=timezone.utc)
 
         return {
@@ -87,13 +81,11 @@ class StackOverFlowClient(BaseClient):
             "updated_at": created_at,
         }
 
-    def _parse_questions_response(
-        self, response_questions: Response
-    ) -> Optional[QuestionsData]:
+    def _parse_questions_response(self, response_questions: Response) -> QuestionsData:
         """Парсинг вопроса."""
 
         data_questions: dict = response_questions.json()
-        item_questions = data_questions.get("items")[0]
+        item_questions = data_questions.get("items", [])[0]
 
         return {
             "url": item_questions.get("link", ""),
