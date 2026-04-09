@@ -12,4 +12,3 @@ lint: ## Run linters in format mode
 .PHONY: test
 test: ## Runs pytest with coverage
 	pytest ./tests 
-

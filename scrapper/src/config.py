@@ -23,9 +23,9 @@ class Settings(BaseSettings):
     logger_level: str = "INFO"
     logger_output: str = "stdout"
 
-    batch_size: Optional[int]
-    update_time: Optional[int]
-    concurrency_links: Optional[int]
+    batch_size: int = 100
+    update_time: int = 20
+    concurrency_links: int = 20
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
