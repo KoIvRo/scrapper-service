@@ -15,7 +15,7 @@ def db_error_handler(func: Callable) -> Callable:
         try:
             return await func(*args, **kwargs)
         except Exception as e:
-            logger.warning(f"Data Base error", extra={"error": e})
+            logger.warning("Data Base error", extra={"error": e})
             raise DataBaseError(e) from e
 
     return wrapper

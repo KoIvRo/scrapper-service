@@ -1,8 +1,24 @@
-from typing import Optional
+from typing import Optional, TypedDict
 from datetime import datetime, timezone
 from .base_client import BaseClient
 from httpx import Response
 from validators.validators import StackOverFlowUrlValidator
+from models.dto.schemas import StackOverFlowEvent
+
+
+class AnswersData(TypedDict):
+    """Словарь с парсингом ответов."""
+
+    author: str
+    preview: str
+    updated_at: datetime
+
+
+class QuestionsData(TypedDict):
+    """Словарь с парсингом вопроса."""
+
+    url: str
+    title: str
 
 
 class StackOverFlowClient(BaseClient):
@@ -11,34 +27,78 @@ class StackOverFlowClient(BaseClient):
     def __init__(self, validator: StackOverFlowUrlValidator) -> None:
         super().__init__(base_url="https://api.stackexchange.com", validator=validator)
 
-    async def get_last_event(self, url: str) -> Optional[datetime]:
+    async def get_last_event(self, url: str) -> Optional[StackOverFlowEvent]:
         """Получение последнего обновления."""
 
         client = await self._get_client()
 
         question_id = self._parse_url(url)
 
-        response = await client.get(
-            f"{self.base_url}/questions/{question_id}",
-            params={"site": "stackoverflow", "filter": "withbody"},
+        params = {
+            "site": "stackoverflow",
+            "filter": "withbody",
+            "sort": "activity",
+            "order": "desc",
+        }
+
+        response_answers = await client.get(
+            f"{self.base_url}/questions/{question_id}/answers",
+            params=params,
         )
 
-        if response.status_code == 200:
-            updated_at = self._parse_response(response)
-            if updated_at:
-                return updated_at
+        response_questions = await client.get(
+            f"{self.base_url}/questions/{question_id}",
+            params=params,
+        )
+
+        if (
+            response_answers.status_code == 200
+            and response_questions.status_code == 200
+        ):
+            answers_data = self._parse_answers_response(response_answers)
+            question_data = self._parse_questions_response(response_questions)
+            return StackOverFlowEvent(
+                title=question_data.get("title", ""),
+                url=question_data.get("link", ""),
+                author=answers_data.get("author", ""),
+                preview=answers_data.get("preview", ""),
+                updated_at=answers_data.get("updated_at", ""),
+            )
 
         return None
 
-    def _parse_response(self, response: Response) -> Optional[datetime]:
-        """Получение даты обновления из ответа."""
-        data: dict = response.json()
-        items: Optional[dict] = data.get("items", None)
-        if items:
-            last_activity = items[0].get("last_activity_date")
-            if last_activity:
-                return datetime.fromtimestamp(last_activity, tz=timezone.utc)
-        return None
+    def _parse_answers_response(
+        self, response_answers: Response
+    ) -> Optional[AnswersData]:
+        """Парсинг ответов."""
+        data_answers: dict = response_answers.json()
+        items_answers = data_answers.get("items", [])
+        if not items_answers:
+            return None
+        item_answers = items_answers[0]
+        created_ts = item_answers.get("creation_date", None)
+        if not created_ts:
+            return None
+        created_at = datetime.fromtimestamp(created_ts, tz=timezone.utc)
+
+        return {
+            "author": item_answers.get("owner", {}).get("display_name", ""),
+            "preview": (item_answers.get("body") or "")[:200],
+            "updated_at": created_at,
+        }
+
+    def _parse_questions_response(
+        self, response_questions: Response
+    ) -> Optional[QuestionsData]:
+        """Парсинг вопроса."""
+
+        data_questions: dict = response_questions.json()
+        item_questions = data_questions.get("items")[0]
+
+        return {
+            "url": item_questions.get("link", ""),
+            "title": item_questions.get("title", ""),
+        }
 
     def _parse_url(self, url: str) -> int:
         if not self.validate_url(url):

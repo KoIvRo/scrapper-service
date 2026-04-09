@@ -39,7 +39,7 @@ class BaseEvent:
         if self.author:
             message += f"Автор: {self.author}\n"
         if self.title:
-            message += f"Заголовок: {self.title}"
+            message += f"Заголовок: {self.title}\n"
         if self.preview:
             message += f"Описание: {self.preview}"
 
