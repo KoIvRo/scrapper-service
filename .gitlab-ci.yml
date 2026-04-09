@@ -42,6 +42,5 @@ Run linters and tests:
     - | 
       poetry run black --check .
       poetry run ruff check --output-format=github --target-version=py311
-      poetry run pytest tests --dead-fixtures --dup-fixtures
-      poetry run pytest bot/tests --dead-fixtures --dup-fixtures
-      poetry run pytest scrapper/tests --dead-fixtures --dup-fixtures
+      poetry run pytest bot/tests
+      poetry run pytest scrapper/tests
