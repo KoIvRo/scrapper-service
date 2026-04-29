@@ -99,15 +99,21 @@ class OrmRepository(BaseRepository):
             )
 
             rows = links_result.all()
+            link_ids = [row.id for row in rows[:limit]]
 
-            tag_rows = await session.execute(
-                select(ChatLinkTag.link_id, Tag.name)
-                .join(Tag, Tag.id == ChatLinkTag.tag_id)
-                .where(ChatLinkTag.chat_id == chat_id)
-            )
+            if link_ids:
+                tag_rows = await session.execute(
+                    select(ChatLinkTag.link_id, Tag.name)
+                    .join(Tag, Tag.id == ChatLinkTag.tag_id)
+                    .where(
+                        ChatLinkTag.chat_id == chat_id, ChatLinkTag.link_id.in_(link_ids)
+                    )
+                )
+                tags_map = self._build_tags_map(tag_rows.all())
+            else:
+                tag_rows = {}
 
         has_next = len(rows) > limit
-        tags_map = self._build_tags_map(tag_rows.all())
 
         return PaginatedLink(
             items=[

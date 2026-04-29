@@ -133,4 +133,6 @@ class Scheduler:
         if link.updated_at is None:
             return True
 
-        return new_date.astimezone(timezone.utc) > link.updated_at.astimezone(timezone.utc)
+        return new_date.astimezone(timezone.utc) > link.updated_at.astimezone(
+            timezone.utc
+        )
