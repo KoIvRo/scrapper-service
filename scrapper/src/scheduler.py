@@ -1,6 +1,6 @@
 import asyncio
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from clients.base_client import BaseClient
 from services.base_service import BaseService
 from notifier.base_notifier import BaseNotifier
@@ -133,4 +133,4 @@ class Scheduler:
         if link.updated_at is None:
             return True
 
-        return new_date.replace(tzinfo=None) > link.updated_at.replace(tzinfo=None)
+        return new_date.astimezone(timezone.utc) > link.updated_at.astimezone(timezone.utc)

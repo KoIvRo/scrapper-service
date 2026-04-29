@@ -21,7 +21,7 @@ links = APIRouter(prefix="/links")
     responses={400: {"model": ApiErrorResponse}, 404: {"model": ApiErrorResponse}},
 )
 async def get_links(
-    page: Optional[int],
+    page: Optional[int] = 0,
     limit: Optional[int] = 5,
     tg_chat_id: int = Header(..., alias="Tg-Chat-Id"),
 ):
