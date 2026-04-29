@@ -7,6 +7,7 @@ from notifier.base_notifier import BaseNotifier
 from models.dto.schemas import GlobalLink, LinkUpdate, PaginatedLink, LinkEvent
 from config import settings
 import logging
+from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -17,14 +18,14 @@ class Scheduler:
     def __init__(
         self,
         service: BaseService,
-        clients: list[BaseClient],
+        clients_map: dict[str, BaseClient],
         notifier: BaseNotifier,
         update_time: int = settings.update_time,
         batch_size: int = settings.batch_size,
         concurrency: int = settings.concurrency_links,
     ) -> None:
         self._service = service
-        self._clients = clients
+        self._clients_map = clients_map
         self._notifier = notifier
         self._running = False
         self._update_time = update_time
@@ -125,10 +126,8 @@ class Scheduler:
             return None
 
     def _select_client(self, url: str) -> Optional[BaseClient]:
-        for client in self._clients:
-            if client.validate_url(url):
-                return client
-        return None
+        domain = urlparse(url).netloc.replace("www.", "")
+        return self._clients_map.get(domain)
 
     def _needs_update(self, link: GlobalLink, new_date: datetime) -> bool:
         if link.updated_at is None:

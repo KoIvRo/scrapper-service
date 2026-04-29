@@ -39,6 +39,13 @@ class ClientFactory:
 
         return [self.get_github_client(), self.get_stackoverflow_client()]
 
+    def get_clients_map(self) -> dict[str, BaseClient]:
+        """Получение клиента за O(1)"""
+        return {
+            "github.com": self.get_github_client(),
+            "stackoverflow.com": self.get_stackoverflow_client(),
+        }
+
 
 client_factory = ClientFactory()
 
@@ -57,3 +64,8 @@ def get_all_clients() -> list[BaseClient]:
     """Получение всех клиентов."""
 
     return client_factory.get_all_clients()
+
+
+def get_clients_map() -> dict[str, BaseClient]:
+    """Получение клиента за O(1)"""
+    return client_factory.get_clients_map()

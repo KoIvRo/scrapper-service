@@ -81,7 +81,8 @@ class LinkService(BaseService):
 
             if await self._exist_link(chat_id, url):
                 logger.warning(
-                    "Attempt to add existing url", extra={"url": url, "chat_id": chat_id}
+                    "Attempt to add existing url",
+                    extra={"url": url, "chat_id": chat_id},
                 )
                 raise ExistLink(url)
 
