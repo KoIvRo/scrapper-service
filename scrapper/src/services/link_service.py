@@ -1,3 +1,4 @@
+from asyncio import Lock
 from typing import Optional
 from models.dto.schemas import Link, GlobalLink, PaginatedLink
 from .base_service import BaseService
@@ -26,6 +27,7 @@ class LinkService(BaseService):
     ) -> None:
         self._repo = repo
         self._validators = validators
+        self._lock = Lock()
 
     async def get_user_links_paginated(
         self, chat_id: int, page: int, limit: int
@@ -59,45 +61,46 @@ class LinkService(BaseService):
 
     async def delete_chat(self, chat_id: int) -> None:
         """Удалить чат."""
+        async with self._lock:
+            if not (await self._exist_chat(chat_id)):
+                logger.warning(
+                    "Attempt to delete non-existent chat", extra={"chat_id": chat_id}
+                )
+                raise UnknownChatError(chat_id)
 
-        if not (await self._exist_chat(chat_id)):
-            logger.warning(
-                "Attempt to delete non-existent chat", extra={"chat_id": chat_id}
-            )
-            raise UnknownChatError(chat_id)
-
-        await self._repo.delete_chat(chat_id)
+            await self._repo.delete_chat(chat_id)
 
     async def append_link(
         self, chat_id: int, url: str, tags: Optional[list[str]]
     ) -> Link:
         """Добавление ссылки."""
+        async with self._lock:
+            if not self._validate_url(url):
+                logger.warning("Attempt to add invalid url", extra={"url": url})
+                raise InvalidURL(url)
 
-        if not self._validate_url(url):
-            logger.warning("Attempt to add invalid url", extra={"url": url})
-            raise InvalidURL(url)
+            if await self._exist_link(chat_id, url):
+                logger.warning(
+                    "Attempt to add existing url", extra={"url": url, "chat_id": chat_id}
+                )
+                raise ExistLink(url)
 
-        if await self._exist_link(chat_id, url):
-            logger.warning(
-                "Attempt to add existing url", extra={"url": url, "chat_id": chat_id}
-            )
-            raise ExistLink(url)
-
-        return await self._repo.append_link(chat_id, url, tags)
+            return await self._repo.append_link(chat_id, url, tags)
 
     async def delete_link(self, chat_id: int, url: str) -> Link:
         """Удаление ссылки"""
+        async with self._lock:
+            if not await self._exist_link(chat_id, url):
+                logger.warning("Attempt to delete non-existent url", extra={"url": url})
+                raise UnknownLink(url)
 
-        if not await self._exist_link(chat_id, url):
-            logger.warning("Attempt to delete non-existent url", extra={"url": url})
-            raise UnknownLink(url)
-
-        return await self._repo.delete_link(chat_id, url)
+            return await self._repo.delete_link(chat_id, url)
 
     async def get_chats_for_link(self, link_id: int) -> bool:
         """Получение чатов, отслеживающих ссылку."""
 
-        return await self._repo.get_chats_for_link(link_id)
+        async with self._lock:
+            return await self._repo.get_chats_for_link(link_id)
 
     async def update_link_timestamp(self, link_id, timestamp: datetime) -> None:
         """Обновить время ссылки."""
