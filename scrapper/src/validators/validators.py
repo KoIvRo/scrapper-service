@@ -1,3 +1,4 @@
+import re
 from abc import ABC, abstractmethod
 
 
@@ -14,35 +15,37 @@ class BaseUrlValidator(ABC):
 class GitHubUrlValidator(BaseUrlValidator):
     """Валидатор для гитхаба."""
 
+    PATTERN = re.compile(
+        r'^https?://'
+        r'(?:www\.)?'
+        r'github\.com/'
+        r'[\w.-]+/'
+        r'[\w.-]+'
+        r'(?:/.*)?$'
+    )
+
     @staticmethod
     def validate_url(url: str) -> bool:
-        len_split_url = 5  # "https", "", github.com, name, respos
-
-        if "github.com" not in url:
-            return False
-
-        return len(url.split("/")) == len_split_url
+        """Валидация ссылки."""
+        return bool(GitHubUrlValidator.PATTERN.match(url))
 
 
 class StackOverFlowUrlValidator(BaseUrlValidator):
     """Валидация для stackoverflow."""
 
+    PATTERN = re.compile(
+        r'^https?://'
+        r'(?:www\.)?'
+        r'stackoverflow\.com/'
+        r'questions/'
+        r'\d+'
+        r'(?:/[\w-]*)?'
+        r'(?:/.*)?$'
+    )
+
     @staticmethod
     def validate_url(url: str) -> bool:
         """Валидация ссылки."""
-        if "stackoverflow.com" not in url:
-            return False
-
-        if "questions" not in url:
-            return False
-
-        url_parts = url.split("/")
-
-        questions_index = url_parts.index("questions")
-        if questions_index + 1 >= len(url_parts):
-            return False
-
-        return True
-
+        return bool(StackOverFlowUrlValidator.PATTERN.match(url))
 
 VALIDATORS = [GitHubUrlValidator, StackOverFlowUrlValidator]
