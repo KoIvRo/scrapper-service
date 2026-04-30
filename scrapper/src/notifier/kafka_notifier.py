@@ -1,4 +1,3 @@
-import json
 import asyncio
 from confluent_kafka import Producer
 from .base_notifier import BaseNotifier

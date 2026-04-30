@@ -72,19 +72,19 @@ services:
     networks:
       - test-network
 
-  kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    ports:
-      - "8080:8080"
-    environment:
-      KAFKA_CLUSTERS_0_NAME: local
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
-    depends_on:
-      - kafka-1
-      - kafka-2
-      - kafka-3
-    networks:
-      - test-network
+  # kafka-ui:
+  #   image: kafka-ui:latest
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     KAFKA_CLUSTERS_0_NAME: local
+  #     KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
+  #   depends_on:
+  #     - kafka-1
+  #     - kafka-2
+  #     - kafka-3
+  #   networks:
+  #     - test-network
 
   bot:
     build: ./bot

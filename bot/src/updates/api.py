@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from bot_instance import get_bot
 from models.schemas import LinkUpdate, ApiErrorResponse
+from .update_handler import handle_update
 
 
 update = APIRouter(prefix="/updates")
@@ -17,11 +18,7 @@ async def get_updates(update: LinkUpdate) -> dict:
     """Полчучение уведомления."""
 
     try:
-        bot = get_bot()
-
-        for chat_id in update.tgChatIds:
-            await bot.send_message(chat_id=chat_id, text=update.description)
-
+        await handle_update(update)
         return {"status": "ok"}
     except Exception as e:
         raise HTTPException(
