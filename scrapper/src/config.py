@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     postgres_port: Optional[int] = None
     postgres_password: Optional[SecretStr] = None
 
+    kafka_bootstrap_servers: Optional[str] = None
+    kafka_topic: str = "link-updates"
+    notification_type: Literal["http", "kafka"] = "kafka"
+
     github_token: Optional[SecretStr] = None
 
     logger_level: str = "INFO"

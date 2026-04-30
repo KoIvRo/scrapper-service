@@ -1,7 +1,11 @@
 from config import settings
 from typing import Optional
 from notifier.bot_notifier import BotNotifier
+from notifier.kafka_notifier import KafkaNotifier
 from notifier.base_notifier import BaseNotifier
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class NotifierFactory:
@@ -14,9 +18,19 @@ class NotifierFactory:
         """Получить уведомитель."""
 
         if self._notifier is None:
-            self._notifier = BotNotifier(settings.bot_url)
+            self._notifier = self._create_notifier()
 
         return self._notifier
+    
+
+    def _create_notifier(self) -> BaseNotifier:
+        """Создать уведомитель."""
+        if settings.notification_type == "kafka":
+            self._notifier = KafkaNotifier(bootstrap_servers=settings.kafka_bootstrap_servers, topic=settings.kafka_topic)
+            logger.info("Kafka producer created", extra={"topic": settings.kafka_topic,})
+        else:
+            self._notifier = BotNotifier(settings.bot_url)
+            logger.info("Bot notifier created", extra={"bot_url": settings.bot_url})
 
 
 notifier_factory = NotifierFactory()

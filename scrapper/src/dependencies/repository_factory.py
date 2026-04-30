@@ -14,11 +14,11 @@ class RepositoryFactory:
         """Поулчения репозитория"""
 
         if not self._repository:
-            self._repository = self.create_repository()
+            self._repository = self._create_repository()
 
         return self._repository
 
-    def create_repository(self) -> BaseRepository:
+    def _create_repository(self) -> BaseRepository:
         """Создание репозитория."""
 
         host = settings.postgres_host
