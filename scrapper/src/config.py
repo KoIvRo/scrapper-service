@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     logger_output: str = "stdout"
 
     batch_size: int = 100
-    update_time: int = 20
+    update_time: int = 10
     concurrency_links: int = 20
 
     model_config = SettingsConfigDict(

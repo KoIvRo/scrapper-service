@@ -21,7 +21,7 @@ class KafkaNotifier(BaseNotifier):
         for update in links_updates:
             message = update.model_dump_json().encode("utf-8")
 
-            await loop.run_in_executor(None, self._send_one(message))
+            await loop.run_in_executor(None, self._send_one, message)
 
         await loop.run_in_executor(None, self._producer.flush)
 

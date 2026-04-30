@@ -26,11 +26,11 @@ class NotifierFactory:
     def _create_notifier(self) -> BaseNotifier:
         """Создать уведомитель."""
         if settings.notification_type == "kafka":
-            self._notifier = KafkaNotifier(bootstrap_servers=settings.kafka_bootstrap_servers, topic=settings.kafka_topic)
-            logger.info("Kafka producer created", extra={"topic": settings.kafka_topic,})
+            logger.info("Kafka producer creating", extra={"topic": settings.kafka_topic,})
+            return KafkaNotifier(bootstrap_servers=settings.kafka_bootstrap_servers, topic=settings.kafka_topic)
         else:
-            self._notifier = BotNotifier(settings.bot_url)
-            logger.info("Bot notifier created", extra={"bot_url": settings.bot_url})
+            logger.info("Bot notifier creating", extra={"bot_url": settings.bot_url})
+            return BotNotifier(settings.bot_url)
 
 
 notifier_factory = NotifierFactory()

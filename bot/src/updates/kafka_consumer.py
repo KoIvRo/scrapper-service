@@ -47,6 +47,8 @@ class KafkaConsumer:
                 update = LinkUpdate(**data)
                 await handle_update(update)
                 await loop.run_in_executor(None, self._consumer.commit, message)
+
+                logger.info("Message was received", extra={"url": str(update.url)})
                 
             except Exception as e:
                 logger.error(f"Failed to process message", extra = {"error": e})

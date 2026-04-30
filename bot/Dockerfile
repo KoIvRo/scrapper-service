@@ -15,4 +15,4 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --with main
 
 COPY src /app
-CMD ["poetry", "run", "python", "main.py"]
+CMD ["sh", "-c", "sleep 5 && poetry run python main.py"]
