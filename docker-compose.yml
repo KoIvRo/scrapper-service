@@ -14,16 +14,58 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - test-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT://0.0.0.0:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - test-network
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    depends_on:
+      - kafka
+    networks:
+      - test-network
+
   bot:
     build: ./bot
     environment:
       SCRAPPER_URL: http://scrapper:8001
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     ports:
       - "8000:8000"
     networks:
       - test-network
     depends_on:
       - postgres
+      - kafka
 
   scrapper:
     build: ./scrapper
@@ -34,6 +76,7 @@ services:
       POSTGRES_HOST: postgres
       POSTGRES_DB: project
       BOT_URL: http://bot:8000
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       access_type: raw # orm, raw
     ports:
       - "8001:8001"
@@ -41,6 +84,7 @@ services:
       - test-network
     depends_on:
       - postgres
+      - kafka
 
 volumes:
   postgres_data:
