@@ -66,7 +66,7 @@ class BaseService(ABC):
         pass
 
     @abstractmethod
-    async def get_outbox_updates(self, limit: int) -> list[LinkUpdate]:
+    async def get_outbox_updates(self, limit: int) -> Optional[list[LinkUpdate]]:
         """Получение ожидающих обновлений."""
         pass
 

@@ -18,8 +18,8 @@ from enum import Enum
 class OutboxStatus(str, Enum):
     """Статусы в таблицу outbox."""
 
-    PENDING: str = "pending"
-    SENT: str = "sent"
+    PENDING = "pending"
+    SENT = "sent"
 
 
 class Base(DeclarativeBase):

@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException
-from bot_instance import get_bot
 from models.schemas import LinkUpdate, ApiErrorResponse
 from .update_handler import handle_update
 

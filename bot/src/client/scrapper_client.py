@@ -52,7 +52,7 @@ class ScrapperClient:
         client = await self._get_client()
 
         try:
-            response = await client.delete(f"{self.base_url}/tg-chat" / {chat_id})
+            response = await client.delete(f"{self.base_url}/tg-chat/{chat_id}")
 
             if response.status_code == 200:
                 return True

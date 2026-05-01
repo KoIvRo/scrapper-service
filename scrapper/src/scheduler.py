@@ -19,7 +19,7 @@ class Scheduler:
         self,
         service: BaseService,
         clients_map: dict[str, BaseClient],
-        notifier: Optional[BaseNotifier],
+        notifier: BaseNotifier,
         update_time: int = settings.update_time,
         batch_size: int = settings.batch_size,
         concurrency: int = settings.concurrency_links,
@@ -62,9 +62,9 @@ class Scheduler:
         page = 0
 
         while True:
-            batch: PaginatedLink[
-                GlobalLink
-            ] = await self._service.get_all_links_paginated(page, self._batch_size)
+            batch: PaginatedLink[GlobalLink] = (
+                await self._service.get_all_links_paginated(page, self._batch_size)
+            )
 
             if not batch.items:
                 break
@@ -124,6 +124,7 @@ class Scheduler:
                 id=link.id, url=str(link.url), description=str(event), tgChatIds=chats
             )
             await self._service.save_update_outbox(link.id, event.updated_at, update)
+            return None
         else:
             await self._service.update_link_timestamp(link.id, event.updated_at)
             return LinkUpdate(

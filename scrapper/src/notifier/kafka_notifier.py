@@ -14,10 +14,12 @@ logger = logging.getLogger(__name__)
 class KafkaNotifier(BaseNotifier):
     """Уведомление бота через Kafka."""
 
-    def __init__(self, bootstrap_servers: str, topic: str, schema_registry_url: str) -> None:
+    def __init__(
+        self, bootstrap_servers: str, topic: str, schema_registry_url: str
+    ) -> None:
         self._topic = topic
 
-        schema_registry_conf = {'url': schema_registry_url}
+        schema_registry_conf = {"url": schema_registry_url}
         self._schema_registry = SchemaRegistryClient(schema_registry_conf)
 
         self._producer = Producer(
@@ -27,7 +29,6 @@ class KafkaNotifier(BaseNotifier):
         )
 
         self._create_schema_registry()
-
 
     async def notify(self, links_updates: list[LinkUpdate]) -> None:
         """Отправка сообщений в Kafka."""
@@ -50,10 +51,10 @@ class KafkaNotifier(BaseNotifier):
 
     def _create_schema_registry(self) -> None:
         schema_path = Path(__file__).parent.parent / "models" / "link_update.avsc"
-        
-        with open(schema_path, 'r') as f:
+
+        with open(schema_path, "r") as f:
             schema_str = f.read()
-      
+
         self._avro_serializer = AvroSerializer(
             self._schema_registry,
             schema_str,

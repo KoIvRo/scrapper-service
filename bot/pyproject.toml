@@ -31,6 +31,11 @@ pytest-mock = "*"
 pytest-repeat = "*"
 pytest-asyncio = "*"
 
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning:authlib._joserfc_helpers",
+]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -1,4 +1,3 @@
-import json
 import asyncio
 from pathlib import Path
 from confluent_kafka import Consumer, KafkaError
@@ -15,8 +14,14 @@ logger = logging.getLogger(__name__)
 class KafkaConsumer:
     """Консьюмер для kafka."""
 
-    def __init__(self, bootstrap_servers: str, topic: str, group_id: str, schema_registry_url: str):
-        schema_registry_conf = {'url': schema_registry_url}
+    def __init__(
+        self,
+        bootstrap_servers: str,
+        topic: str,
+        group_id: str,
+        schema_registry_url: str,
+    ):
+        schema_registry_conf = {"url": schema_registry_url}
         self._schema_registry = SchemaRegistryClient(schema_registry_conf)
         self._create_schema_registry()
 
@@ -39,7 +44,7 @@ class KafkaConsumer:
         self._running = True
         loop = asyncio.get_event_loop()
 
-        logger.info(f"Kafka consumer started", extra={"topic": self._topic})
+        logger.info("Kafka consumer started", extra={"topic": self._topic})
 
         while self._running:
             message = await loop.run_in_executor(
@@ -62,7 +67,10 @@ class KafkaConsumer:
                 )
 
                 if update.updated_id in self._processed_id:
-                    logger.warning("Duplicate message detected", extra={"url": str(update.url), "updated_id": update.updated_id})
+                    logger.warning(
+                        "Duplicate message detected",
+                        extra={"url": str(update.url), "updated_id": update.updated_id},
+                    )
                     await loop.run_in_executor(None, self._consumer.commit, message)
                     continue
 
@@ -73,7 +81,7 @@ class KafkaConsumer:
                 logger.info("Message was received", extra={"url": str(update.url)})
 
             except Exception as e:
-                logger.error(f"Failed to process message", extra={"error": e})
+                logger.error("Failed to process message", extra={"error": e})
 
     def stop(self):
         self._running = False
@@ -81,10 +89,10 @@ class KafkaConsumer:
 
     def _create_schema_registry(self) -> None:
         schema_path = Path(__file__).parent.parent / "models" / "link_update.avsc"
-        
-        with open(schema_path, 'r') as f:
+
+        with open(schema_path, "r") as f:
             schema_str = f.read()
-        
+
         self._avro_deserializer = AvroDeserializer(
             self._schema_registry,
             schema_str,

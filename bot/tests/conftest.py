@@ -4,11 +4,47 @@ import pytest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
+from fastapi import FastAPI
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 os.environ["BOT_TOKEN"] = "test_token"
 
 from config import settings  # noqa
+from updates.kafka_consumer import KafkaConsumer
+
+
+@pytest.fixture
+def mock_avro():
+    """Мок для Avro десериализатора."""
+    with patch.object(KafkaConsumer, "_create_schema_registry"):
+        with patch("updates.kafka_consumer.AvroDeserializer") as mock:
+            yield mock
+
+
+@pytest.fixture
+def mock_consumer():
+    """Мок для confluent-kafka Consumer."""
+    with patch("updates.kafka_consumer.Consumer") as mock:
+        yield mock
+
+
+@pytest.fixture
+def mock_handle_update():
+    """Мок для handle_update."""
+    with patch("updates.kafka_consumer.handle_update", new_callable=AsyncMock) as mock:
+        yield mock
+
+
+@pytest.fixture
+def kafka_consumer(mock_avro, mock_consumer):
+    """Экземпляр KafkaConsumer с замоканным consumer."""
+    consumer = KafkaConsumer(
+        bootstrap_servers="localhost:9092",
+        topic="test-topic",
+        group_id="test-group",
+        schema_registry_url="http://localhost:8081",
+    )
+    return consumer
 
 
 @pytest.fixture
@@ -27,12 +63,32 @@ def message_factory():
 
 
 @pytest.fixture
-def client():
-    """Тестовый клиент FastAPI с подставленным токеном."""
-    with patch.dict("os.environ", {"BOT_TOKEN": "test_token"}):
-        from main import app
+def app_with_mock_bot():
+    """Создаёт приложение FastAPI с замоканным ботом."""
+    with patch("updates.api.get_bot") as mock_get_bot:
+        bot = AsyncMock()
+        bot.send_message = AsyncMock()
+        mock_get_bot.return_value = bot
 
-        return TestClient(app)
+        from updates.api import update
+
+        app = FastAPI()
+        app.include_router(update)
+        yield app, mock_get_bot
+
+
+@pytest.fixture
+def client(app_with_mock_bot):
+    """Тестовый клиент FastAPI."""
+    app, _ = app_with_mock_bot
+    return TestClient(app)
+
+
+@pytest.fixture
+def mock_bot(app_with_mock_bot):
+    """Мок для бота."""
+    _, mock_get_bot = app_with_mock_bot
+    return mock_get_bot
 
 
 @pytest.fixture
@@ -44,13 +100,3 @@ def valid_update_data():
         "description": "Test update",
         "tgChatIds": [123, 456],
     }
-
-
-@pytest.fixture
-def mock_bot():
-    """Мок для бота."""
-    with patch("api.updates.get_bot") as mock:
-        bot = AsyncMock()
-        bot.send_message = AsyncMock()
-        mock.return_value = bot
-        yield mock

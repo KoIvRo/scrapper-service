@@ -3,7 +3,7 @@ import sys
 import pytest
 from pathlib import Path
 from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
@@ -31,6 +31,63 @@ from repository.base_repository import BaseRepository
 from clients.stackoverflow_client import StackOverFlowClient
 from clients.github_client import GitHubClient
 from dependencies.client_factory import ClientFactory
+from models.dto.schemas import LinkUpdate
+from notifier.kafka_notifier import KafkaNotifier
+
+
+@pytest.fixture
+def mock_producer():
+    """Мок для confluent-kafka Producer."""
+    with patch("notifier.kafka_notifier.Producer") as mock:
+        mock_producer = MagicMock()
+        mock_producer.produce = MagicMock()
+        mock_producer.flush = MagicMock()
+        mock.return_value = mock_producer
+        yield mock
+
+
+@pytest.fixture
+def mock_avro():
+    """Мок для AvroSerializer."""
+    with patch("notifier.kafka_notifier.AvroSerializer") as mock:
+        mock_serializer = MagicMock()
+        mock_serializer.return_value = b"fake-avro-bytes"
+        mock.return_value = mock_serializer
+        yield mock
+
+
+@pytest.fixture
+def kafka_notifier(mock_producer, mock_avro):
+    """Экземпляр KafkaNotifier."""
+    with patch.object(KafkaNotifier, "_create_schema_registry"):
+        notifier = KafkaNotifier(
+            bootstrap_servers="localhost:9092",
+            topic="test-topic",
+            schema_registry_url="http://localhost:8081",
+        )
+        notifier._avro_serializer = MagicMock(return_value=b"fake-avro-bytes")
+        return notifier
+
+
+@pytest.fixture
+def sample_updates():
+    """Тестовые LinkUpdate."""
+    return [
+        LinkUpdate(
+            updated_id="uuid-1",
+            id=1,
+            url="https://github.com/user/repo",
+            description="Test update",
+            tgChatIds=[123],
+        ),
+        LinkUpdate(
+            updated_id="uuid-2",
+            id=2,
+            url="https://github.com/user/repo2",
+            description="Test update 2",
+            tgChatIds=[456],
+        ),
+    ]
 
 
 @pytest.fixture

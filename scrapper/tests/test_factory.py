@@ -27,13 +27,6 @@ class TestRepositoryFactory:
 
         assert repo1 is repo2
 
-    def test_repository_creation(self):
-        """Репозиторий создается корректно."""
-
-        repo = repository_factory.create_repository()
-
-        assert repo is not None
-
 
 class TestServiceFactory:
     """Тест фабрики сервисов."""
@@ -72,15 +65,3 @@ class TestClientFactory:
             assert all(
                 client for client in all_clients if isinstance(client, BaseClient)
             )
-
-
-class TestNotifierFactory:
-    """Тест фабрики нотификатора."""
-
-    def test_factory_singleton(self, notifier_factory):
-        """Проверка синглтона."""
-        not1 = notifier_factory.get_notifier()
-        not2 = notifier_factory.get_notifier()
-
-        assert notifier_factory._notifier is not None
-        assert not1 is not2

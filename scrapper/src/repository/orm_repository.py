@@ -109,6 +109,8 @@ class OrmRepository(BaseRepository):
             rows = links_result.all()
             link_ids = [row.id for row in rows[:limit]]
 
+            tags_map = {}
+
             if link_ids:
                 tag_rows = await session.execute(
                     select(ChatLinkTag.link_id, Tag.name)
@@ -119,8 +121,6 @@ class OrmRepository(BaseRepository):
                     )
                 )
                 tags_map = self._build_tags_map(tag_rows.all())
-            else:
-                tag_rows = {}
 
         has_next = len(rows) > limit
 

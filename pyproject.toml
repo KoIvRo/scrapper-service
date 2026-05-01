@@ -40,6 +40,11 @@ mypy = "^1.19.1"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::DeprecationWarning:authlib._joserfc_helpers",
+]
+
 [tool.mypy]
 # Расскомментируйте следующую строку, если используете Pydantic
 plugins = ['pydantic.mypy']

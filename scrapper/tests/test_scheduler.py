@@ -3,7 +3,7 @@ import pytest
 from unittest.mock import AsyncMock, Mock
 
 from scheduler import Scheduler
-from models.dto.schemas import GlobalLink, PaginatedLink, LinkUpdate, BaseEvent
+from models.dto.schemas import GlobalLink, BaseEvent
 
 
 class TestScheduler:
