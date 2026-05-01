@@ -1,8 +1,12 @@
 import json
 import asyncio
+from pathlib import Path
 from confluent_kafka import Consumer, KafkaError
 from models.schemas import LinkUpdate
 from .update_handler import handle_update
+from confluent_kafka.schema_registry import SchemaRegistryClient
+from confluent_kafka.schema_registry.avro import AvroDeserializer
+from confluent_kafka.serialization import SerializationContext, MessageField
 import logging
 
 logger = logging.getLogger(__name__)
@@ -11,7 +15,11 @@ logger = logging.getLogger(__name__)
 class KafkaConsumer:
     """Консьюмер для kafka."""
 
-    def __init__(self, bootstrap_servers: str, topic: str, group_id: str):
+    def __init__(self, bootstrap_servers: str, topic: str, group_id: str, schema_registry_url: str):
+        schema_registry_conf = {'url': schema_registry_url}
+        self._schema_registry = SchemaRegistryClient(schema_registry_conf)
+        self._create_schema_registry()
+
         self._consumer = Consumer(
             {
                 "bootstrap.servers": bootstrap_servers,
@@ -48,8 +56,10 @@ class KafkaConsumer:
                 continue
 
             try:
-                data = json.loads(message.value().decode("utf-8"))
-                update = LinkUpdate(**data)
+                update: LinkUpdate = self._avro_deserializer(
+                    message.value(),
+                    SerializationContext(self._topic, MessageField.VALUE),
+                )
 
                 if update.updated_id in self._processed_id:
                     logger.warning("Duplicate message detected", extra={"url": str(update.url), "updated_id": update.updated_id})
@@ -68,3 +78,21 @@ class KafkaConsumer:
     def stop(self):
         self._running = False
         self._consumer.close()
+
+    def _create_schema_registry(self) -> None:
+        schema_path = Path(__file__).parent.parent / "models" / "link_update.avsc"
+        
+        with open(schema_path, 'r') as f:
+            schema_str = f.read()
+        
+        self._avro_deserializer = AvroDeserializer(
+            self._schema_registry,
+            schema_str,
+            lambda data, ctx: LinkUpdate(
+                updated_id=data["updated_id"],
+                id=data["id"],
+                url=data["url"],
+                description=data["description"],
+                tgChatIds=data["tgChatIds"],
+            ),
+        )

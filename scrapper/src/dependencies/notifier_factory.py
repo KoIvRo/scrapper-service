@@ -34,6 +34,7 @@ class NotifierFactory:
             return KafkaNotifier(
                 bootstrap_servers=settings.kafka_bootstrap_servers,
                 topic=settings.kafka_topic,
+                schema_registry_url=settings.schema_registry_url,
             )
         else:
             logger.info("Bot notifier creating", extra={"bot_url": settings.bot_url})

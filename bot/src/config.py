@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     kafka_consumer_group: str = "bot-consumer-group"
     notification_type: Literal["kafka", "http"] = "kafka"
 
+    schema_registry_url: Optional[str] = None
+
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
     )

@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     update_time: int = 10
     concurrency_links: int = 20
 
+    schema_registry_url: Optional[str] = None
+
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
     )

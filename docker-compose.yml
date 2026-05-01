@@ -72,11 +72,27 @@ services:
     networks:
       - test-network
 
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.5.0
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    networks:
+      - test-network
+
   bot:
     build: ./bot
     environment:
       SCRAPPER_URL: http://scrapper:8001
       KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
     ports:
       - "8000:8000"
     networks:
@@ -86,6 +102,7 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
+      - schema-registry
 
   scrapper:
     build: ./scrapper
@@ -98,6 +115,7 @@ services:
       BOT_URL: http://bot:8000
       KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
       access_type: raw
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
     ports:
       - "8001:8001"
     networks:
@@ -107,6 +125,7 @@ services:
       - kafka-1
       - kafka-2
       - kafka-3
+      - schema-registry
 
 volumes:
   postgres_data:
