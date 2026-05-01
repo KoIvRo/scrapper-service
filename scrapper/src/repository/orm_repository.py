@@ -10,7 +10,7 @@ from models.orm.schemas import (
 )
 from pydantic import HttpUrl
 from .base_repository import BaseRepository, db_error_handler
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy import select, update, delete, func, exists
 from sqlalchemy.dialects.postgresql import insert
@@ -345,5 +345,18 @@ class OrmRepository(BaseRepository):
                 update(Outbox)
                 .where(Outbox.id.in_(ids))
                 .values(status=OutboxStatus.SENT.value, processed_at=datetime.now())
+            )
+            await session.commit()
+
+    @db_error_handler
+    async def cleanup_outbox(self, days_to_truncate: int):
+        """Очистить старые отправленные записи."""
+
+        async with self.AsyncSessionLocal() as session:
+            cutoff_date = datetime.now() - timedelta(days=days_to_truncate)
+            await session.execute(
+                delete(Outbox)
+                .where(Outbox.status == OutboxStatus.SENT.value)
+                .where(Outbox.processed_at < cutoff_date)
             )
             await session.commit()

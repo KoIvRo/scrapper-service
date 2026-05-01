@@ -74,3 +74,8 @@ class BaseService(ABC):
     async def mark_outbox_updates(self, updates: list[LinkUpdate]) -> None:
         """Пометить обновления обработанными."""
         pass
+
+    @abstractmethod
+    async def cleanup_outbox(self, days_to_truncate: int) -> None:
+        """Очистить старые записи в outbox."""
+        pass

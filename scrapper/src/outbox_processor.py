@@ -16,21 +16,31 @@ class OutboxProcessor:
         notifier: BaseNotifier,
         batch_size: int = settings.batch_size,
         update_time: int = 1,
+        cleanup_interval: int = 3600,
+        days_to_truncate: int = 1,
     ) -> None:
         self._service = service
         self._notifier = notifier
         self._batch_size = batch_size
         self._update_time = update_time
         self._running: bool = False
+        self._cleanup_interval = cleanup_interval
+        self._days_to_truncate = days_to_truncate
 
     async def start(self) -> None:
         """Начать работу по проверке Outbox."""
 
         self._running = True
+        last_cleanup = asyncio.get_running_loop().time()
 
         while self._running:
             try:
                 start = asyncio.get_running_loop().time()
+
+                if start - last_cleanup > self._cleanup_interval:
+                    last_cleanup = start
+                    await self._service.cleanup_outbox(self._days_to_truncate)
+                    logger.info("Outbox was cleaned")
 
                 await self._check_all_links()
 
@@ -54,4 +64,4 @@ class OutboxProcessor:
 
     async def stop(self) -> None:
         """Остановка работы OutboxProcessor."""
-        self.running = False
+        self._running = False

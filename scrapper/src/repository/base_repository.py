@@ -102,3 +102,8 @@ class BaseRepository(ABC):
     async def mark_outbox_updates(self, updates: list[int]) -> None:
         """Пометить обновления как обработанные."""
         pass
+
+    @abstractmethod
+    async def cleanup_outbox(self, days_to_truncate) -> None:
+        """Удалить старые сообщения."""
+        pass

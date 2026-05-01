@@ -128,6 +128,10 @@ class LinkService(BaseService):
         # ЭТО id В ТАБЛИЦЕ OUTBOX!!!
         await self._repo.mark_outbox_updates([update.id for update in updates])
 
+    async def cleanup_outbox(self, days_to_truncate: int) -> None:
+        """Очистить старые сообщения в outbox."""
+        await self._repo.cleanup_outbox(days_to_truncate)
+
     def _validate_url(self, url: str) -> bool:
         """Проверить по всем валидаторам при добавлении."""
 

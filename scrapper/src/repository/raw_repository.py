@@ -132,6 +132,12 @@ class OutboxQueries:
         WHERE id = ANY($1::int[]);
     """
 
+    CLEANUP: str = """
+        DELETE FROM outbox 
+        WHERE status = 'sent' 
+        AND processed_at < NOW() - INTERVAL '1 day';
+    """
+
 
 class RawRepository(BaseRepository):
     """Класс RAW SQL запросов."""
@@ -316,3 +322,8 @@ class RawRepository(BaseRepository):
         """Пометить записи как отправленные."""
         async with self._get_conn() as conn:
             await conn.execute(OutboxQueries.MARK_AS_SENT, ids)
+
+    @db_error_handler
+    async def cleanup_outbox(self, days_to_truncate: int):
+        async with self._get_conn() as conn:
+            await conn.execute(OutboxQueries.CLEANUP, days_to_truncate)
