@@ -43,6 +43,11 @@ class OutboxProcessor:
     async def _check_all_links(self) -> None:
         """Проверить все ссылки."""
 
+        updates = await self._service.get_outbox_updates()
+
+        if updates:
+            self._notifier.notify(updates)
+            # TODO Обновить статус
 
     async def stop(self) -> None:
         """Остановка работы OutboxProcessor."""

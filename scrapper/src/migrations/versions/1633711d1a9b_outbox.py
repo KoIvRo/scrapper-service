@@ -29,7 +29,7 @@ def upgrade() -> None:
                status NOT NULL DEFAULT 'pending',
                created_at TIMESTAMP WITh TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                processed_at TIMESTAMP WITH TIME ZONE,
-               CONSTRAINT chk_outbox_status CHECK (status IN ('pending', 'processing', 'sent'))
+               CONSTRAINT chk_outbox_status CHECK (status IN ('pending', 'sent'))
                )
         """
     )

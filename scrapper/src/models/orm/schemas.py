@@ -19,7 +19,6 @@ class OutboxStatus(str, Enum):
     """Статусы в таблицу outbox."""
 
     PENDING: str = "pending"
-    PROCESSING: str = "processing"
     SENT: str = "sent"
 
 

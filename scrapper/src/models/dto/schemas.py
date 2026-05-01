@@ -60,15 +60,6 @@ class StackOverFlowEvent(BaseEvent):
     pass
 
 
-@dataclass
-class LinkEvent:
-    """Событие связанное с ссылкой."""
-
-    link_id: int
-    url: HttpUrl  # Ссылка, которая отслеживается
-    event: BaseEvent
-
-
 class GlobalLink(BaseModel):
     """Глобальная хранящаяся ссылка без учета чатов, используется scheduler."""
 

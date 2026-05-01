@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from clients.base_client import BaseClient
 from services.base_service import BaseService
 from notifier.base_notifier import BaseNotifier
-from models.dto.schemas import GlobalLink, LinkUpdate, PaginatedLink, LinkEvent
+from models.dto.schemas import GlobalLink, LinkUpdate, PaginatedLink, BaseEvent
 from urllib.parse import urlparse
 from config import settings
 import logging
@@ -19,7 +19,7 @@ class Scheduler:
         self,
         service: BaseService,
         clients_map: dict[str, BaseClient],
-        notifier: BaseNotifier,
+        notifier: Optional[BaseNotifier],
         update_time: int = settings.update_time,
         batch_size: int = settings.batch_size,
         concurrency: int = settings.concurrency_links,
@@ -61,9 +61,9 @@ class Scheduler:
         page = 0
 
         while True:
-            batch: PaginatedLink[GlobalLink] = (
-                await self._service.get_all_links_paginated(page, self._batch_size)
-            )
+            batch: PaginatedLink[
+                GlobalLink
+            ] = await self._service.get_all_links_paginated(page, self._batch_size)
 
             if not batch.items:
                 break
@@ -83,33 +83,20 @@ class Scheduler:
 
             page += 1
 
-    async def _send_update(self, link_events: list[LinkEvent]) -> None:
+    async def _send_update(self, link_updates: list[LinkUpdate]) -> None:
         """Подготовить Update."""
-        updates: list[LinkUpdate] = []
 
-        for link in link_events:
-            chats = await self._service.get_chats_for_link(link.link_id)
+        if link_updates:
+            await self._notifier.notify(link_updates)
 
-            updates.append(
-                LinkUpdate(
-                    id=link.link_id,
-                    description=str(link.event),
-                    url=str(link.url),
-                    tgChatIds=chats,
-                )
-            )
-
-        if updates:
-            await self._notifier.notify(updates)
-
-    async def _get_links_for_notify(self, links: list[GlobalLink]) -> list[LinkEvent]:
+    async def _get_links_for_notify(self, links: list[GlobalLink]) -> list[LinkUpdate]:
         tasks = [self._check_single_link(link) for link in links]
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        return [r for r in results if isinstance(r, LinkEvent)]
+        return [r for r in results if isinstance(r, LinkUpdate)]
 
-    async def _check_single_link(self, link: GlobalLink) -> Optional[LinkEvent]:
+    async def _check_single_link(self, link: GlobalLink) -> Optional[LinkUpdate]:
         async with self._sem:
             client = self._select_client(str(link.url))
 
@@ -126,14 +113,27 @@ class Scheduler:
                 return None
 
             if self._needs_update(link, event.updated_at):
-                if self._use_outbox:
-                    # TODO serivce
-                    pass
-                else:
-                    await self._service.update_link_timestamp(link.id, event.updated_at)
-                    return LinkEvent(link_id=link.id, event=event, url=str(link.url))
+                return self._process_single_links(link, event)
 
             return None
+
+    async def _process_single_links(
+        self, link: GlobalLink, event: BaseEvent
+    ) -> Optional[LinkUpdate]:
+        """Обработка одиночной сслыки."""
+        chats = await self._service.get_chats_for_link(link.id)
+        if self._use_outbox:
+            update = LinkUpdate(
+                id=link.id, url=str(link.url), description=str(event), tgChatIds=chats
+            )
+            await self._service.save_update_outbox(
+                link.id, event.updated_at, str(update)
+            )
+        else:
+            await self._service.update_link_timestamp(link.id, event.updated_at)
+            return LinkUpdate(
+                id=link.id, url=str(link.url), description=str(event), tgChatIds=chats
+            )
 
     def _select_client(self, url: str) -> Optional[BaseClient]:
         domain = urlparse(url).netloc.replace("www.", "")
