@@ -4,7 +4,7 @@ from pydantic import HttpUrl
 from datetime import datetime
 from contextlib import asynccontextmanager
 from .base_repository import BaseRepository, db_error_handler
-from models.dto.schemas import Link, GlobalLink, PaginatedLink
+from models.dto.schemas import Link, GlobalLink, PaginatedLink, LinkUpdate
 
 
 class ChatQueryies:
@@ -105,6 +105,14 @@ class LinkQueries:
         FROM chats_links AS cl
         JOIN links AS l ON cl.link_id = l.id
         WHERE cl.chat_id = $1 AND l.url = $2;
+    """
+
+
+class OutboxQueries:
+    """Класс запросов к outbox."""
+
+    SAVE_UPDATE: str = """
+        INSERT INTO outbox (payload) VALUES ($1);
     """
 
 
@@ -265,3 +273,15 @@ class RawRepository(BaseRepository):
         async with self._get_conn() as conn:
             result = await conn.fetchval(LinkQueries.EXIST_LINK, chat_id, url)
         return result is not None
+
+    @db_error_handler
+    async def save_update_outbox(
+        self, link_id: int, timestamp: datetime, update: LinkUpdate
+    ):
+        """Сохранить обновление и обновить время в одной транзакции."""
+        async with self._get_conn() as conn:
+            async with conn.transaction():
+                await conn.execute(
+                    LinkQueries.UPDATE_LINK_TIMESTAMP, link_id, timestamp
+                )
+                await conn.execute(OutboxQueries.SAVE_UPDATE, update.model_dump_json())

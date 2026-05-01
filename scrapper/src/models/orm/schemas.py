@@ -9,7 +9,18 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     func,
     Index,
+    JSON,
 )
+from models.dto.schemas import LinkUpdate
+from enum import Enum
+
+
+class OutboxStatus(str, Enum):
+    """Статусы в таблицу outbox."""
+
+    PENDING: str = "pending"
+    PROCESSING: str = "processing"
+    SENT: str = "sent"
 
 
 class Base(DeclarativeBase):
@@ -92,4 +103,22 @@ class ChatLinkTag(Base):
         ),
         ForeignKeyConstraint(["tag_id"], ["tags.id"], ondelete="CASCADE"),
         Index("idx_clt_chat_link", "chat_id", "link_id"),
+    )
+
+
+class Outbox(Base):
+    """Таблица для транзакции Outbox."""
+
+    __tablename__ = "outbox"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    payload: Mapped[LinkUpdate] = mapped_column(JSON, nullable=False)
+    status: Mapped[str] = mapped_column(
+        VARCHAR(20), nullable=False, default=OutboxStatus.PENDING.value
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), server_default=func.now()
+    )
+    processed_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=True
     )

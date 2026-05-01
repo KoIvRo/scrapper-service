@@ -35,9 +35,13 @@ async def run_scrapper() -> None:
     clients_map = get_clients_map()
     notifier = get_notifier()
 
-    scheduler = Scheduler(service, clients_map, notifier)
-
-    await scheduler.start()
+    if settings.notification_type == "http":
+        scheduler = Scheduler(service, clients_map, notifier)
+        # TODO outbox_processor
+        await scheduler.start()
+    else:
+        scheduler = Scheduler(service, clients_map, notifier, use_outbox=False)
+        await scheduler.start()
 
 
 async def main() -> None:

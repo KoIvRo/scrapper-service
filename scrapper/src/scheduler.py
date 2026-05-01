@@ -5,9 +5,9 @@ from clients.base_client import BaseClient
 from services.base_service import BaseService
 from notifier.base_notifier import BaseNotifier
 from models.dto.schemas import GlobalLink, LinkUpdate, PaginatedLink, LinkEvent
+from urllib.parse import urlparse
 from config import settings
 import logging
-from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +23,7 @@ class Scheduler:
         update_time: int = settings.update_time,
         batch_size: int = settings.batch_size,
         concurrency: int = settings.concurrency_links,
+        use_outbox: bool = True,
     ) -> None:
         self._service = service
         self._clients_map = clients_map
@@ -31,6 +32,7 @@ class Scheduler:
         self._update_time = update_time
         self._batch_size = batch_size
         self._sem = asyncio.Semaphore(concurrency)
+        self._use_outbox: bool = use_outbox
 
     async def start(self) -> None:
         """Запуск"""
@@ -68,8 +70,12 @@ class Scheduler:
 
             links_to_notify = await self._get_links_for_notify(batch.items)
 
-            if links_to_notify:
-                logger.info(f"Find {len(links_to_notify)} links for update.")
+            if not links_to_notify:
+                break
+
+            logger.info("Find links for update.", extra={"count": len(links_to_notify)})
+
+            if not self._use_outbox:
                 await self._send_update(links_to_notify)
 
             if not batch.has_next:
@@ -120,8 +126,12 @@ class Scheduler:
                 return None
 
             if self._needs_update(link, event.updated_at):
-                await self._service.update_link_timestamp(link.id, event.updated_at)
-                return LinkEvent(link_id=link.id, event=event, url=str(link.url))
+                if self._use_outbox:
+                    # TODO serivce
+                    pass
+                else:
+                    await self._service.update_link_timestamp(link.id, event.updated_at)
+                    return LinkEvent(link_id=link.id, event=event, url=str(link.url))
 
             return None
 

@@ -30,7 +30,7 @@ class BaseClient(ABC):
 
     @abstractmethod
     async def get_last_event(self, url: str) -> Optional[BaseEvent]:
-        """Получение времени последнего апдейта."""
+        """Получение последнего апдейта."""
         pass
 
     @abstractmethod

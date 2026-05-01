@@ -1,5 +1,5 @@
 from typing import Optional
-from models.dto.schemas import Link, GlobalLink, PaginatedLink
+from models.dto.schemas import Link, GlobalLink, PaginatedLink, LinkUpdate
 from abc import ABC, abstractmethod
 from validators.validators import BaseUrlValidator
 from repository.base_repository import BaseRepository
@@ -56,4 +56,11 @@ class BaseService(ABC):
     @abstractmethod
     async def update_link_timestamp(self, link_id, timestamp: datetime) -> None:
         """Обновить время ссылки."""
+        pass
+
+    @abstractmethod
+    async def save_update_outbox(
+        self, link_id: int, timestamp: datetime, update: LinkUpdate
+    ) -> None:
+        """Сохранить запись о обновлении в таблицу Outbox."""
         pass

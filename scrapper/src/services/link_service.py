@@ -1,6 +1,6 @@
 from asyncio import Lock
 from typing import Optional
-from models.dto.schemas import Link, GlobalLink, PaginatedLink
+from models.dto.schemas import Link, GlobalLink, PaginatedLink, LinkUpdate
 from .base_service import BaseService
 from validators.validators import BaseUrlValidator
 from repository.base_repository import BaseRepository
@@ -107,6 +107,13 @@ class LinkService(BaseService):
         """Обновить время ссылки."""
 
         await self._repo.update_link_timestamp(link_id, timestamp)
+
+    async def save_update_outbox(
+        self, link_id: int, timestamp: datetime, update: LinkUpdate
+    ):
+        """Сохранить обновление в outbox."""
+
+        await self._repo.save_update_outbox(link_id, timestamp, update)
 
     def _validate_url(self, url: str) -> bool:
         """Проверить по всем валидаторам при добавлении."""

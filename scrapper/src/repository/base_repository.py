@@ -1,4 +1,4 @@
-from models.dto.schemas import Link, GlobalLink, PaginatedLink
+from models.dto.schemas import Link, GlobalLink, PaginatedLink, LinkUpdate
 from abc import ABC, abstractmethod
 from datetime import datetime
 from functools import wraps
@@ -84,4 +84,11 @@ class BaseRepository(ABC):
     @abstractmethod
     async def exist_chat(self, chat_id: int) -> bool:
         """Проверка существует ли чат."""
+        pass
+
+    @abstractmethod
+    async def save_update_outbox(
+        self, link_id: int, timestamp: datetime, update: LinkUpdate
+    ):
+        """Сохранить обновление и обновить время в одной транзакции."""
         pass
