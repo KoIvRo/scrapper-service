@@ -1,3 +1,4 @@
+from uuid import uuid4
 from datetime import datetime
 from dataclasses import dataclass
 from typing import Optional, TypeVar, Generic
@@ -81,6 +82,7 @@ class Link(BaseModel):
 class LinkUpdate(BaseModel):
     """Модель обновления ссылки согласно OpenAPI контракту."""
 
+    updated_id: str = Field(default_factory=lambda: str(uuid4()))
     id: int
     url: str
     description: str = Field(default="Обнаружно изменение")

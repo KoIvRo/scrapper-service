@@ -23,6 +23,7 @@ class KafkaConsumer:
         self._topic = topic
         self._running = False
         self._update_time = 1
+        self._processed_id: set[str] = set()
 
     async def start(self):
         """Запуск чтения. handler — функция для обработки LinkUpdate."""
@@ -49,7 +50,14 @@ class KafkaConsumer:
             try:
                 data = json.loads(message.value().decode("utf-8"))
                 update = LinkUpdate(**data)
+
+                if update.updated_id in self._processed_id:
+                    logger.warning("Duplicate message detected", extra={"url": str(update.url), "updated_id": update.updated_id})
+                    await loop.run_in_executor(None, self._consumer.commit, message)
+                    continue
+
                 await handle_update(update)
+                self._processed_id.add(update.updated_id)
                 await loop.run_in_executor(None, self._consumer.commit, message)
 
                 logger.info("Message was received", extra={"url": str(update.url)})
