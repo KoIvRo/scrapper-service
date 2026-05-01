@@ -50,6 +50,7 @@ class Scheduler:
                 await asyncio.sleep(max(0, self._update_time - elapsed))
             except Exception as e:
                 logger.critical(f"Scheduler error: {e}")
+                await asyncio.sleep(self._update_time)
 
     async def stop(self) -> None:
         """Остановить scheduler."""
@@ -70,11 +71,6 @@ class Scheduler:
 
             links_to_notify = await self._get_links_for_notify(batch.items)
 
-            if not links_to_notify:
-                break
-
-            logger.info("Find links for update.", extra={"count": len(links_to_notify)})
-
             if not self._use_outbox:
                 await self._send_update(links_to_notify)
 
@@ -83,7 +79,7 @@ class Scheduler:
 
             page += 1
 
-    async def _send_update(self, link_updates: list[LinkUpdate]) -> None:
+    async def _send_update(self, link_updates: Optional[list[LinkUpdate]]) -> None:
         """Подготовить Update."""
 
         if link_updates:
@@ -113,7 +109,8 @@ class Scheduler:
                 return None
 
             if self._needs_update(link, event.updated_at):
-                return self._process_single_links(link, event)
+                logger.info("Link need update", extra={"url": str(link.url)})
+                return await self._process_single_links(link, event)
 
             return None
 
@@ -127,7 +124,7 @@ class Scheduler:
                 id=link.id, url=str(link.url), description=str(event), tgChatIds=chats
             )
             await self._service.save_update_outbox(
-                link.id, event.updated_at, str(update)
+                link.id, event.updated_at, update
             )
         else:
             await self._service.update_link_timestamp(link.id, event.updated_at)

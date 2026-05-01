@@ -26,7 +26,7 @@ def upgrade() -> None:
             CREATE TABLE IF NOT EXISTS outbox(
                id SERIAL PRIMARY KEY,
                payload JSONB NOT NULL,
-               status NOT NULL DEFAULT 'pending',
+               status VARCHAR(20) NOT NULL DEFAULT 'pending',
                created_at TIMESTAMP WITh TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                processed_at TIMESTAMP WITH TIME ZONE,
                CONSTRAINT chk_outbox_status CHECK (status IN ('pending', 'sent'))

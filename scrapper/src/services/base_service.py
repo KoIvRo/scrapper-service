@@ -64,3 +64,13 @@ class BaseService(ABC):
     ) -> None:
         """Сохранить запись о обновлении в таблицу Outbox."""
         pass
+
+    @abstractmethod
+    async def get_outbox_updates(self, limit: int) -> list[LinkUpdate]:
+        """Получение ожидающих обновлений."""
+        pass
+
+    @abstractmethod
+    async def mark_outbox_updates(self, updates: list[LinkUpdate]) -> None:
+        """Пометить обновления обработанными."""
+        pass

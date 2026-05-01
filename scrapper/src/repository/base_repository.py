@@ -89,6 +89,16 @@ class BaseRepository(ABC):
     @abstractmethod
     async def save_update_outbox(
         self, link_id: int, timestamp: datetime, update: LinkUpdate
-    ):
+    ) -> None:
         """Сохранить обновление и обновить время в одной транзакции."""
+        pass
+
+    @abstractmethod
+    async def get_outbox_updates(self, limit: int) -> list[LinkUpdate]:
+        """Получить ссылки ожидающие обновления."""
+        pass
+
+    @abstractmethod
+    async def mark_outbox_updates(self, updates: list[int]) -> None:
+        """Пометить обновления как обработанные."""
         pass

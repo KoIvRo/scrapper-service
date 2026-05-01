@@ -15,7 +15,7 @@ class OutboxProcessor:
         service: BaseService,
         notifier: BaseNotifier,
         batch_size: int = settings.batch_size,
-        update_time: int = settings.update_time,
+        update_time: int = 1
     ) -> None:
         self._service = service
         self._notifier = notifier
@@ -39,15 +39,18 @@ class OutboxProcessor:
                 await asyncio.sleep(max(0, self._update_time - elapsed))
             except Exception as e:
                 logger.critical("Error in OutboxProcessor", extra={"error": e})
+                await asyncio.sleep(self._update_time)
 
     async def _check_all_links(self) -> None:
         """Проверить все ссылки."""
 
-        updates = await self._service.get_outbox_updates()
+        updates = await self._service.get_outbox_updates(self._batch_size)
 
         if updates:
-            self._notifier.notify(updates)
-            # TODO Обновить статус
+            logger.info("Have updates", extra={"count": len(updates)})
+            await self._notifier.notify(updates)
+            await self._service.mark_outbox_updates(updates)
+            logger.info("Sent updates", extra={"count": len(updates)})
 
     async def stop(self) -> None:
         """Остановка работы OutboxProcessor."""

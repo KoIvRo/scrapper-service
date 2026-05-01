@@ -21,5 +21,4 @@ def init_logger() -> None:
     logger.addHandler(log_handler)
     logger.setLevel(settings.logger_level)
 
-    logging.getLogger("aiogram").setLevel(logging.WARNING)
-    logging.getLogger("aiohttp").setLevel(logging.WARNING)
+    logging.getLogger("httpx").setLevel(logging.WARNING)

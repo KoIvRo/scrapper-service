@@ -112,8 +112,19 @@ class LinkService(BaseService):
         self, link_id: int, timestamp: datetime, update: LinkUpdate
     ):
         """Сохранить обновление в outbox."""
-
         await self._repo.save_update_outbox(link_id, timestamp, update)
+        logger.info("Updates saved in outbox")
+
+    async def get_outbox_updates(self, limit: int) -> list[LinkUpdate]:
+        """Получить ожидающиеся обновления."""
+        result = await self._repo.get_outbox_updates(limit)
+        logger.info("Received updates from outbox", extra={"count": len(result)})
+        return result
+
+    async def mark_outbox_updates(self, updates: list[LinkUpdate]) -> None:
+        """Пометить обновления обработанными."""
+        # ЭТО id В ТАБЛИЦЕ OUTBOX!!!
+        await self._repo.mark_outbox_updates([update.id for update in updates])
 
     def _validate_url(self, url: str) -> bool:
         """Проверить по всем валидаторам при добавлении."""
