@@ -115,11 +115,13 @@ class LinkService(BaseService):
         await self._repo.save_update_outbox(link_id, timestamp, update)
         logger.info("Updates saved in outbox")
 
-    async def get_outbox_updates(self, limit: int) -> list[LinkUpdate]:
+    async def get_outbox_updates(self, limit: int) -> Optional[list[LinkUpdate]]:
         """Получить ожидающиеся обновления."""
         result = await self._repo.get_outbox_updates(limit)
-        logger.info("Received updates from outbox", extra={"count": len(result)})
-        return result
+        if result:
+            logger.info("Received updates from outbox", extra={"count": len(result)})
+            return result
+        return None
 
     async def mark_outbox_updates(self, updates: list[LinkUpdate]) -> None:
         """Пометить обновления обработанными."""

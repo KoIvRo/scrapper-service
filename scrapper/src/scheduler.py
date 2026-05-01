@@ -123,9 +123,7 @@ class Scheduler:
             update = LinkUpdate(
                 id=link.id, url=str(link.url), description=str(event), tgChatIds=chats
             )
-            await self._service.save_update_outbox(
-                link.id, event.updated_at, update
-            )
+            await self._service.save_update_outbox(link.id, event.updated_at, update)
         else:
             await self._service.update_link_timestamp(link.id, event.updated_at)
             return LinkUpdate(

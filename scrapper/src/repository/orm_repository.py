@@ -1,5 +1,13 @@
 from models.dto.schemas import Link, GlobalLink, PaginatedLink
-from models.orm.schemas import Chat, Link as LinkORM, Tag, ChatLink, ChatLinkTag
+from models.orm.schemas import (
+    Chat,
+    Link as LinkORM,
+    Tag,
+    ChatLink,
+    ChatLinkTag,
+    Outbox,
+    OutboxStatus,
+)
 from pydantic import HttpUrl
 from .base_repository import BaseRepository, db_error_handler
 from datetime import datetime
@@ -289,5 +297,53 @@ class OrmRepository(BaseRepository):
         async with self.AsyncSessionLocal() as session:
             await session.execute(
                 update(LinkORM).where(LinkORM.id == link_id).values(updated_at=cur_date)
+            )
+            await session.commit()
+
+    @db_error_handler
+    async def save_update_outbox(
+        self, link_id: int, timestamp: datetime, update_payload: str
+    ) -> None:
+        """Сохранить обновление и обновить время в одной транзакции."""
+        async with self.AsyncSessionLocal() as session:
+            async with session.begin():
+                await session.execute(
+                    update(LinkORM)
+                    .where(LinkORM.id == link_id)
+                    .values(updated_at=timestamp)
+                )
+                session.add(
+                    Outbox(payload=update_payload, status=OutboxStatus.PENDING.value)
+                )
+
+    @db_error_handler
+    async def get_outbox_updates(self, limit: int = 10) -> list[dict]:
+        """Получить pending записи из outbox."""
+        async with self.AsyncSessionLocal() as session:
+            result = await session.execute(
+                select(Outbox)
+                .where(Outbox.status == OutboxStatus.PENDING.value)
+                .order_by(Outbox.created_at)
+                .limit(limit)
+            )
+            rows = result.scalars().all()
+            return [
+                {
+                    "id": row.id,
+                    "payload": row.payload,
+                    "status": row.status,
+                    "created_at": row.created_at,
+                }
+                for row in rows
+            ]
+
+    @db_error_handler
+    async def mark_outbox_updates(self, ids: list[int]) -> None:
+        """Пометить записи как отправленные."""
+        async with self.AsyncSessionLocal() as session:
+            await session.execute(
+                update(Outbox)
+                .where(Outbox.id.in_(ids))
+                .values(status=OutboxStatus.SENT.value, processed_at=datetime.now())
             )
             await session.commit()

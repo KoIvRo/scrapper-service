@@ -15,7 +15,7 @@ class OutboxProcessor:
         service: BaseService,
         notifier: BaseNotifier,
         batch_size: int = settings.batch_size,
-        update_time: int = 1
+        update_time: int = 1,
     ) -> None:
         self._service = service
         self._notifier = notifier

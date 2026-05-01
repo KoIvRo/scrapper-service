@@ -19,7 +19,9 @@ class ChatQueryies:
         """DELETE FROM chats_links_tags WHERE chat_id = $1;"""
     )
 
-    DELETE_CHAT_FROM_CHATS_LINKS: str = """DELETE FROM chats_links WHERE chat_id = $1;"""
+    DELETE_CHAT_FROM_CHATS_LINKS: str = (
+        """DELETE FROM chats_links WHERE chat_id = $1;"""
+    )
 
     DELETE_CHAT: str = """DELETE FROM chats WHERE id = $1;"""
 
@@ -129,6 +131,7 @@ class OutboxQueries:
         SET status = 'sent', processed_at = NOW()
         WHERE id = ANY($1::int[]);
     """
+
 
 class RawRepository(BaseRepository):
     """Класс RAW SQL запросов."""
@@ -304,21 +307,12 @@ class RawRepository(BaseRepository):
     async def get_outbox_updates(self, limit: int = 10) -> list[LinkUpdate]:
         """Получить pending ссылки из outbox."""
         async with self._get_conn() as conn:
-            rows = await conn.fetch(
-                OutboxQueries.GET_PENDING_UPDATES, 
-                limit
-            )
-        
-        return [
-            LinkUpdate(**json.loads(row["payload"])) 
-            for row in rows
-        ]
+            rows = await conn.fetch(OutboxQueries.GET_PENDING_UPDATES, limit)
+
+        return [LinkUpdate(**json.loads(row["payload"])) for row in rows]
 
     @db_error_handler
     async def mark_outbox_updates(self, ids: list[int]) -> None:
         """Пометить записи как отправленные."""
         async with self._get_conn() as conn:
-            await conn.execute(
-                OutboxQueries.MARK_AS_SENT,
-                ids
-            )
+            await conn.execute(OutboxQueries.MARK_AS_SENT, ids)
