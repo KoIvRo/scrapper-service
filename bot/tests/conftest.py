@@ -2,7 +2,7 @@ import sys
 import os
 import pytest
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, patch, MagicMock
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
 
@@ -10,6 +10,7 @@ sys.path.append(str(Path(__file__).parent.parent / "src"))
 os.environ["BOT_TOKEN"] = "test_token"
 
 from config import settings  # noqa
+from updates.api import update
 from updates.kafka_consumer import KafkaConsumer
 
 
@@ -65,13 +66,10 @@ def message_factory():
 @pytest.fixture
 def app_with_mock_bot():
     """Создаёт приложение FastAPI с замоканным ботом."""
-    with patch("updates.api.get_bot") as mock_get_bot:
+    with patch("updates.update_handler.get_bot") as mock_get_bot:
         bot = AsyncMock()
         bot.send_message = AsyncMock()
         mock_get_bot.return_value = bot
-
-        from updates.api import update
-
         app = FastAPI()
         app.include_router(update)
         yield app, mock_get_bot
