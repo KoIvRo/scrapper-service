@@ -106,7 +106,8 @@ class OrmRepository(BaseRepository):
                     select(ChatLinkTag.link_id, Tag.name)
                     .join(Tag, Tag.id == ChatLinkTag.tag_id)
                     .where(
-                        ChatLinkTag.chat_id == chat_id, ChatLinkTag.link_id.in_(link_ids)
+                        ChatLinkTag.chat_id == chat_id,
+                        ChatLinkTag.link_id.in_(link_ids),
                     )
                 )
                 tags_map = self._build_tags_map(tag_rows.all())

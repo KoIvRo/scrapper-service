@@ -27,6 +27,5 @@ class Settings(BaseSettings):
     )
 
 
-
 # Инициализируем общие настройки
 settings = Settings()

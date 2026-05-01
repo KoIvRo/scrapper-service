@@ -20,6 +20,7 @@ async def run_api() -> None:
     server = uvicorn.Server(config)
     await server.serve()
 
+
 async def run_consumer() -> None:
     """Запуск консьюмера."""
 

@@ -11,7 +11,11 @@ class KafkaNotifier(BaseNotifier):
     """Уведомление бота через Kafka."""
 
     def __init__(self, bootstrap_servers: str, topic: str) -> None:
-        self._producer = Producer({"bootstrap.servers": bootstrap_servers,})
+        self._producer = Producer(
+            {
+                "bootstrap.servers": bootstrap_servers,
+            }
+        )
         self._topic = topic
 
     async def notify(self, links_updates: list[LinkUpdate]) -> None:
@@ -25,7 +29,10 @@ class KafkaNotifier(BaseNotifier):
 
         await loop.run_in_executor(None, self._producer.flush)
 
-        logger.info("Send messages in Kafka", extra = {"count": len(links_updates), "topic": self._topic},)
+        logger.info(
+            "Send messages in Kafka",
+            extra={"count": len(links_updates), "topic": self._topic},
+        )
 
     def _send_one(self, message: bytes) -> None:
         """Синхронная отправка одного сообщения."""
