@@ -277,7 +277,7 @@ def valid_github_link():
 @pytest.fixture
 def mock_cache():
     """Мок CacheManager."""
-    cache = MagicMock(spec=CacheManager) # noqa
+    cache = MagicMock(spec=CacheManager)  # noqa
     cache.get_cache_links = AsyncMock(return_value=None)
     cache.save_cache_links = AsyncMock()
     cache.delete_cache_links = AsyncMock()
