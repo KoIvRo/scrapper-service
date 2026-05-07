@@ -14,6 +14,65 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  valkey-1:
+    image: bitnami/valkey:8.1
+    environment:
+      VALKEY_PORT: 6379
+      VALKEY_CLUSTER_ENABLED: "yes"
+      VALKEY_CLUSTER_NODE_TIMEOUT: 5000
+      VALKEY_CLUSTER_ANNOUNCE_IP: valkey-1
+      ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "6379:6379"
+    networks:
+      - test-network
+    volumes:
+      - valkey_data_1:/bitnami/valkey/data
+
+  valkey-2:
+    image: bitnami/valkey:8.1
+    environment:
+      VALKEY_PORT: 6379
+      VALKEY_CLUSTER_ENABLED: "yes"
+      VALKEY_CLUSTER_NODE_TIMEOUT: 5000
+      VALKEY_CLUSTER_ANNOUNCE_IP: valkey-2
+      ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "6380:6379"
+    networks:
+      - test-network
+    volumes:
+      - valkey_data_2:/bitnami/valkey/data
+
+  valkey-3:
+    image: bitnami/valkey:8.1
+    environment:
+      VALKEY_PORT: 6379
+      VALKEY_CLUSTER_ENABLED: "yes"
+      VALKEY_CLUSTER_NODE_TIMEOUT: 5000
+      VALKEY_CLUSTER_ANNOUNCE_IP: valkey-3
+      ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "6381:6379"
+    networks:
+      - test-network
+    volumes:
+      - valkey_data_3:/bitnami/valkey/data
+
+  valkey-init:
+    image: bitnami/valkey:8.1
+    depends_on:
+      - valkey-1
+      - valkey-2
+      - valkey-3
+    networks:
+      - test-network
+    entrypoint: >
+      /bin/bash -c "
+      sleep 10 &&
+      valkey-cli --cluster create valkey-1:6379 valkey-2:6379 valkey-3:6379 --cluster-yes
+      "
+
   bot:
     build: ./bot
     environment:
@@ -25,6 +84,7 @@ services:
       - test-network
     depends_on:
       - postgres
+      - valkey-init
 
   scrapper:
     build: ./scrapper
@@ -37,15 +97,22 @@ services:
       BOT_URL: http://bot:8000
       NOTIFICATION_TYPE: http
       ACCESS_TYPE: raw
+      VALKEY_HOST: valkey-1
+      VALKEY_PORT: 6379
+      VALKEY_TTL: 300
     ports:
       - "8001:8001"
     networks:
       - test-network
     depends_on:
       - postgres
+      - valkey-init
 
 volumes:
   postgres_data:
+  valkey_data_1:
+  valkey_data_2:
+  valkey_data_3:
 
 networks:
   test-network:

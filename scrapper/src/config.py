@@ -33,6 +33,10 @@ class Settings(BaseSettings):
 
     schema_registry_url: Optional[str] = None
 
+    valkey_host: Optional[str] = None
+    valkey_port: Optional[int] = None
+    valkey_ttl: Optional[int] = None
+
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
     )
