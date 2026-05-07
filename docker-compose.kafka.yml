@@ -93,6 +93,7 @@ services:
       SCRAPPER_URL: http://scrapper:8001
       KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
       SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      NOTIFICATION_TYPE: http
     ports:
       - "8000:8000"
     networks:
@@ -114,7 +115,8 @@ services:
       POSTGRES_DB: project
       BOT_URL: http://bot:8000
       KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
-      access_type: raw
+      ACCESS_TYPE: raw
+      NOTIFICATION_TYPE: http
       SCHEMA_REGISTRY_URL: http://schema-registry:8081
     ports:
       - "8001:8001"
