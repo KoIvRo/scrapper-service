@@ -28,7 +28,7 @@ class ScrapperClient:
             else:
                 return ListLinksResponse(links=[], size=0, has_next=False)
         except Exception:
-            return ListLinksResponse(links=[], size=0)
+            return ListLinksResponse(links=[], size=0, has_next=False)
 
     async def register_chat(self, chat_id: int) -> bool:
         """Регистрация чата."""

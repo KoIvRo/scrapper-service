@@ -17,15 +17,13 @@ class BaseClient(ABC):
         self._client: Optional[httpx.AsyncClient] = None
 
     async def _get_client(self) -> httpx.AsyncClient:
-        """Получение клиента."""
-
-        if self._client:
+        if self._client and not self._client.is_closed:
             return self._client
 
         self._client = httpx.AsyncClient(
-            base_url=self.base_url, timeout=self.timeout, follow_redirects=True
+            timeout=self.timeout,
+            follow_redirects=True,
         )
-
         return self._client
 
     @abstractmethod
