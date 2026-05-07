@@ -3,13 +3,19 @@ from models.dto.schemas import Link, GlobalLink, PaginatedLink, LinkUpdate
 from abc import ABC, abstractmethod
 from validators.validators import BaseUrlValidator
 from repository.base_repository import BaseRepository
+from cache import CacheManager
 from datetime import datetime
 
 
 class BaseService(ABC):
     """Базовый класс для сервиса."""
 
-    def __init__(self, repo: BaseRepository, validators: list[BaseUrlValidator]):
+    def __init__(
+        self,
+        repo: BaseRepository,
+        cache_manager: CacheManager,
+        validators: list[BaseUrlValidator],
+    ):
         pass
 
     @abstractmethod

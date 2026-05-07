@@ -4,6 +4,7 @@ from models.dto.schemas import Link, GlobalLink, PaginatedLink, LinkUpdate
 from .base_service import BaseService
 from validators.validators import BaseUrlValidator
 from repository.base_repository import BaseRepository
+from cache_manager import CacheManager
 from exceptions import (
     UnknownChatError,
     UnknownLink,
@@ -23,9 +24,13 @@ class LinkService(BaseService):
     """Прокси к слою базы данных."""
 
     def __init__(
-        self, repo: BaseRepository, validators: list[BaseUrlValidator]
+        self,
+        repo: BaseRepository,
+        cache_manager: CacheManager,
+        validators: list[BaseUrlValidator],
     ) -> None:
         self._repo = repo
+        self._cache_manager = cache_manager
         self._validators = validators
         self._lock = Lock()
 
@@ -43,7 +48,17 @@ class LinkService(BaseService):
 
         self._validate_pagination(page, limit)
 
-        return await self._repo.get_chat_links_paginated(chat_id, page, limit)
+        paginated_link = await self._cache_manager.get_cache_links(chat_id, page, limit)
+
+        if paginated_link is None:
+            paginated_link = await self._repo.get_chat_links_paginated(
+                chat_id, page, limit
+            )
+            await self._cache_manager.save_cache_links(
+                chat_id, page, limit, paginated_link
+            )
+
+        return paginated_link
 
     async def get_all_links_paginated(
         self, page: int, limit: int
@@ -86,6 +101,8 @@ class LinkService(BaseService):
                 )
                 raise ExistLink(url)
 
+            await self._cache_manager.delete_cache_links(chat_id)
+
             return await self._repo.append_link(chat_id, url, tags)
 
     async def delete_link(self, chat_id: int, url: str) -> Link:
@@ -94,6 +111,8 @@ class LinkService(BaseService):
             if not await self._exist_link(chat_id, url):
                 logger.warning("Attempt to delete non-existent url", extra={"url": url})
                 raise UnknownLink(url)
+
+            await self._cache_manager.delete_cache_links(chat_id)
 
             return await self._repo.delete_link(chat_id, url)
 

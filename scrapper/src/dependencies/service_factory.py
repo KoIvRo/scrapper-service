@@ -1,8 +1,8 @@
 from validators.validators import VALIDATORS
 from services.link_service import LinkService
 from services.base_service import BaseService
-from repository.base_repository import BaseRepository
 from .repository_factory import get_repository
+from .cache_factory import get_cache_manager
 
 
 class ServiceFactory:
@@ -17,9 +17,10 @@ class ServiceFactory:
         if self._link_service:
             return self._link_service
 
-        repository: BaseRepository = get_repository()
+        repository = get_repository()
+        cache_manager = get_cache_manager()
 
-        self._link_service = LinkService(repository, VALIDATORS)
+        self._link_service = LinkService(repository, cache_manager, VALIDATORS)
         return self._link_service
 
 

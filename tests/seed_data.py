@@ -2,7 +2,9 @@ import asyncio
 import httpx
 
 
-async def fill_user(client: httpx.AsyncClient, user: int, links_per_user: int, sem: asyncio.Semaphore):
+async def fill_user(
+    client: httpx.AsyncClient, user: int, links_per_user: int, sem: asyncio.Semaphore
+):
     async with sem:
         await client.post(f"http://localhost:8001/tg-chat/{user}")
 
