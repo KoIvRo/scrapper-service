@@ -1,9 +1,9 @@
 [tool.poetry]
-name = "backend-academy-2026-python-template"
+name = "scrapper"
 version = "0.1.0"
 description = ""
 package-mode = false
-authors = ["g.tarasov <g.tarasov@tbank.ru>"]
+authors = ["i.korotaev"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
