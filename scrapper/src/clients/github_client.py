@@ -9,8 +9,8 @@ from validators.validators import GitHubUrlValidator
 class GitHubClient(BaseClient):
     """Клиент для гитхаба."""
 
-    def __init__(self, token: str, validator: GitHubUrlValidator) -> None:
-        super().__init__(base_url="https://api.github.com", validator=validator)
+    def __init__(self, token: str, validator: GitHubUrlValidator, timeout: int = 10) -> None:
+        super().__init__(base_url="https://api.github.com", validator=validator, timeout=timeout)
         self._token = token
 
     async def get_last_event(self, url: str) -> Optional[GitHubEvent]:

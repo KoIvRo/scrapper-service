@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     valkey_port: Optional[int] = None
     valkey_ttl: Optional[int] = None
 
+    timeout: Optional[int] = None
+
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
     )

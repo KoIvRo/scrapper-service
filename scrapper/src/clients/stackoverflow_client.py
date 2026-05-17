@@ -24,8 +24,8 @@ class QuestionsData(TypedDict):
 class StackOverFlowClient(BaseClient):
     """Клиент для stackoverflow."""
 
-    def __init__(self, validator: StackOverFlowUrlValidator) -> None:
-        super().__init__(base_url="https://api.stackexchange.com", validator=validator)
+    def __init__(self, validator: StackOverFlowUrlValidator, timeout: int = 10) -> None:
+        super().__init__(base_url="https://api.stackexchange.com", validator=validator, timeout=timeout)
 
     async def get_last_event(self, url: str) -> Optional[StackOverFlowEvent]:
         """Получение последнего обновления."""

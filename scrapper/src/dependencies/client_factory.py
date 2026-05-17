@@ -20,6 +20,7 @@ class ClientFactory:
             self._github_client = GitHubClient(
                 token=settings.github_token.get_secret_value(),
                 validator=GitHubUrlValidator,
+                timeout=settings.timeout
             )
 
         return self._github_client
@@ -29,7 +30,8 @@ class ClientFactory:
 
         if not self._stackoverflow_client:
             self._stackoverflow_client = StackOverFlowClient(
-                validator=StackOverFlowUrlValidator
+                validator=StackOverFlowUrlValidator,
+                timeout=settings.timeout
             )
 
         return self._stackoverflow_client
