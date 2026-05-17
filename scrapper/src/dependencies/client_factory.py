@@ -1,3 +1,4 @@
+import httpx
 from config import settings
 from typing import Optional
 from clients.base_client import BaseClient
@@ -20,7 +21,7 @@ class ClientFactory:
             self._github_client = GitHubClient(
                 token=settings.github_token.get_secret_value(),
                 validator=GitHubUrlValidator,
-                timeout=settings.timeout
+                timeout=self._get_httpx_timeout()
             )
 
         return self._github_client
@@ -31,7 +32,7 @@ class ClientFactory:
         if not self._stackoverflow_client:
             self._stackoverflow_client = StackOverFlowClient(
                 validator=StackOverFlowUrlValidator,
-                timeout=settings.timeout
+                timeout=self._get_httpx_timeout()
             )
 
         return self._stackoverflow_client
@@ -47,6 +48,15 @@ class ClientFactory:
             "github.com": self.get_github_client(),
             "stackoverflow.com": self.get_stackoverflow_client(),
         }
+    
+    def _get_httpx_timeout(self) -> httpx.Timeout:
+        """Созадать timeout объект."""
+        return httpx.Timeout(
+            connect = settings.timeout_connect,
+            read = settings.timeout_read,
+            write = settings.timeout_write,
+            pool = settings.timeout_pool
+        )
 
 
 client_factory = ClientFactory()

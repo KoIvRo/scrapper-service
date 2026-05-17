@@ -1,4 +1,4 @@
-from httpx import Response
+import httpx
 from typing import Optional
 from datetime import datetime
 from .base_client import BaseClient
@@ -9,7 +9,7 @@ from validators.validators import GitHubUrlValidator
 class GitHubClient(BaseClient):
     """Клиент для гитхаба."""
 
-    def __init__(self, token: str, validator: GitHubUrlValidator, timeout: int = 10) -> None:
+    def __init__(self, token: str, validator: GitHubUrlValidator, timeout: httpx.Timeout) -> None:
         super().__init__(base_url="https://api.github.com", validator=validator, timeout=timeout)
         self._token = token
 
@@ -43,7 +43,7 @@ class GitHubClient(BaseClient):
 
         return None
 
-    def _parse_response(self, response: Response) -> Optional[GitHubEvent]:
+    def _parse_response(self, response: httpx.Response) -> Optional[GitHubEvent]:
         """Получение даты обновления из ответа."""
         data: list = response.json()
 

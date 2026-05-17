@@ -9,10 +9,10 @@ class BaseClient(ABC):
     """Интерфейс для клиентов."""
 
     def __init__(
-        self, base_url: str, validator: BaseUrlValidator, timeout: int = 10
+        self, base_url: str, validator: BaseUrlValidator, timeout: httpx.Timeout
     ) -> None:
         self.base_url = base_url
-        self.timeout = timeout
+        self._timeout = timeout
         self._validator = validator
         self._client: Optional[httpx.AsyncClient] = None
 
@@ -21,7 +21,7 @@ class BaseClient(ABC):
             return self._client
 
         self._client = httpx.AsyncClient(
-            timeout=self.timeout,
+            timeout=self._timeout,
             follow_redirects=True,
         )
         return self._client
