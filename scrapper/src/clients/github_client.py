@@ -9,15 +9,18 @@ from validators.validators import GitHubUrlValidator
 class GitHubClient(BaseClient):
     """Клиент для гитхаба."""
 
-    def __init__(self, token: str, validator: GitHubUrlValidator, timeout: httpx.Timeout) -> None:
-        super().__init__(base_url="https://api.github.com", validator=validator, timeout=timeout)
+    def __init__(
+        self, token: str, validator: GitHubUrlValidator, timeout: httpx.Timeout
+    ) -> None:
+        super().__init__(
+            base_url="https://api.github.com", validator=validator, timeout=timeout
+        )
         self._token = token
 
     async def get_last_event(self, url: str) -> Optional[GitHubEvent]:
         """Получение времени последнего апдейта."""
 
         owner, repo = self._parse_url(url)
-        client = await self._get_client()
 
         headers = {
             "Accept": "application/vnd.github.v3+json",
@@ -31,7 +34,7 @@ class GitHubClient(BaseClient):
             "per_page": 1,
         }
 
-        response = await client.get(
+        response = await self._get(
             f"{self.base_url}/repos/{owner}/{repo}/issues",
             headers=headers,
             params=params,

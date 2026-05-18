@@ -3,6 +3,7 @@ from typing import Optional
 from abc import ABC, abstractmethod
 from validators.validators import BaseUrlValidator
 from models.dto.schemas import BaseEvent
+from .retry_decorator import retry_decorator
 
 
 class BaseClient(ABC):
@@ -25,6 +26,16 @@ class BaseClient(ABC):
             follow_redirects=True,
         )
         return self._client
+
+    @retry_decorator
+    async def _get(
+        self, url: str, headers: Optional[dict] = None, params: Optional[dict] = None
+    ) -> httpx.Response:
+        """Сделать get."""
+        client = await self._get_client()
+        response = await client.get(url, params=params, headers=headers)
+        response.raise_for_status()
+        return response
 
     @abstractmethod
     async def get_last_event(self, url: str) -> Optional[BaseEvent]:
