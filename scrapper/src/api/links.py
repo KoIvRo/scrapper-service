@@ -1,5 +1,5 @@
 from dependencies.service_factory import get_service
-from fastapi import APIRouter, HTTPException, Header
+from fastapi import APIRouter, HTTPException, Header, Request
 from exceptions import ScrapperServiceError
 from typing import Optional
 from models.dto.schemas import (
@@ -26,6 +26,7 @@ limiter = Limiter(key_func=get_remote_address)
 )
 @limiter.limit(settings.rate_limit_links_get)
 async def get_links(
+    request: Request, # noqa
     page: Optional[int] = 0,
     limit: Optional[int] = 5,
     tg_chat_id: int = Header(..., alias="Tg-Chat-Id"),
@@ -72,7 +73,9 @@ async def get_links(
 @links.post("")
 @limiter.limit(settings.rate_limit_links_post)
 async def append_link(
-    request: AddLinkRequest, tg_chat_id: int = Header(..., alias="Tg-Chat-Id")
+    request: Request, # noqa
+    add_request: AddLinkRequest,
+    tg_chat_id: int = Header(..., alias="Tg-Chat-Id"),
 ):
     """Добавление ссылки."""
 
@@ -80,7 +83,7 @@ async def append_link(
 
     try:
         link = await service.append_link(
-            chat_id=tg_chat_id, url=str(request.link), tags=request.tags
+            chat_id=tg_chat_id, url=str(add_request.link), tags=add_request.tags
         )
         return LinkResponse(id=link.id, url=link.url, tags=link.tags, filters=[])
     except ScrapperServiceError as e:
@@ -104,14 +107,16 @@ async def append_link(
 )
 @limiter.limit(settings.rate_limit_links_delete)
 async def delete_link(
-    request: RemoveLinkRequest, tg_chat_id: int = Header(..., alias="Tg-Chat-Id")
+    request: Request, # noqa
+    remove_request: RemoveLinkRequest,
+    tg_chat_id: int = Header(..., alias="Tg-Chat-Id"),
 ):
     """Удаление ссылки."""
 
     service = get_service()
 
     try:
-        link = await service.delete_link(chat_id=tg_chat_id, url=str(request.link))
+        link = await service.delete_link(chat_id=tg_chat_id, url=str(remove_request.link))
         return LinkResponse(id=link.id, url=link.url, tags=link.tags, filters=[])
     except ScrapperServiceError as e:
         raise HTTPException(

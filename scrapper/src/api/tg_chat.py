@@ -1,6 +1,6 @@
 from exceptions import ScrapperServiceError
 from models.dto.schemas import ApiErrorResponse
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from dependencies.service_factory import get_service
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -16,7 +16,7 @@ limiter = Limiter(get_remote_address)
     responses={400: {"model": ApiErrorResponse}, 409: {"model": ApiErrorResponse}},
 )
 @limiter.limit(settings.rate_limit_chats_post)
-async def append_chat(id: int) -> dict:
+async def append_chat(request: Request, id: int) -> dict:
     """Добавление чата."""
 
     service = get_service()
@@ -43,7 +43,7 @@ async def append_chat(id: int) -> dict:
     responses={400: {"model": ApiErrorResponse}, 404: {"model": ApiErrorResponse}},
 )
 @limiter.limit(settings.rate_limit_links_delete)
-async def delete_chat(id: int) -> dict:
+async def delete_chat(request: Request, id: int) -> dict:
     """Удаление чата."""
 
     service = get_service()

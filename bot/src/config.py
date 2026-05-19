@@ -20,7 +20,6 @@ class Settings(BaseSettings):
     kafka_bootstrap_servers: Optional[str] = None
     kafka_topic: str = "link_updates"
     kafka_consumer_group: str = "bot-consumer-group"
-    notification_type: Literal["kafka", "http"] = "kafka"
 
     schema_registry_url: Optional[str] = None
 

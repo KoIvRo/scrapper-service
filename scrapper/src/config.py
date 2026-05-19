@@ -20,7 +20,6 @@ class Settings(BaseSettings):
 
     kafka_bootstrap_servers: Optional[str] = None
     kafka_topic: str = "link-updates"
-    notification_type: Literal["http", "kafka"] = "kafka"
 
     github_token: Optional[SecretStr] = None
 

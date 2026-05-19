@@ -38,10 +38,9 @@ async def main() -> None:
 
     await bot_factory.setup()
 
-    if settings.notification_type == "kafka":
-        await asyncio.gather(get_dispatcher().start_polling(get_bot()), run_consumer())
-    else:
-        await asyncio.gather(get_dispatcher().start_polling(get_bot()), run_api())
+    await asyncio.gather(
+        get_dispatcher().start_polling(get_bot()), run_api(), run_consumer()
+    )
 
 
 if __name__ == "__main__":

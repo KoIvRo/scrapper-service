@@ -4,7 +4,7 @@ from typing import Optional
 from abc import ABC, abstractmethod
 from validators.validators import BaseUrlValidator
 from models.dto.schemas import BaseEvent
-from .retry_decorator import retry_decorator
+from retry_decorator import retry_decorator
 
 
 class BaseClient(ABC):

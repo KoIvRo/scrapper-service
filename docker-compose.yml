@@ -103,7 +103,6 @@ services:
       SCRAPPER_URL: http://scrapper:8001
       KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
       SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      NOTIFICATION_TYPE: kafka
     ports:
       - "8000:8000"
     networks:
@@ -125,7 +124,6 @@ services:
       POSTGRES_DB: project
       BOT_URL: http://bot:8000
       KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
-      NOTIFICATION_TYPE: kafka
       SCHEMA_REGISTRY_URL: http://schema-registry:8081
       VALKEY_HOST: valkey
       VALKEY_PORT: 6379

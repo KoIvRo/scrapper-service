@@ -3,7 +3,6 @@ from typing import Optional
 from datetime import datetime, timezone
 from clients.base_client import BaseClient
 from services.base_service import BaseService
-from notifier.base_notifier import BaseNotifier
 from models.dto.schemas import GlobalLink, LinkUpdate, PaginatedLink, BaseEvent
 from urllib.parse import urlparse
 from config import settings
@@ -19,20 +18,16 @@ class Scheduler:
         self,
         service: BaseService,
         clients_map: dict[str, BaseClient],
-        notifier: BaseNotifier,
         update_time: int = settings.update_time,
         batch_size: int = settings.batch_size,
         concurrency: int = settings.concurrency_links,
-        use_outbox: bool = True,
     ) -> None:
         self._service = service
         self._clients_map = clients_map
-        self._notifier = notifier
         self._running = False
         self._update_time = update_time
         self._batch_size = batch_size
         self._sem = asyncio.Semaphore(concurrency)
-        self._use_outbox: bool = use_outbox
 
     async def start(self) -> None:
         """Запуск"""
@@ -71,19 +66,10 @@ class Scheduler:
 
             links_to_notify = await self._get_links_for_notify(batch.items)
 
-            if not self._use_outbox:
-                await self._send_update(links_to_notify)
-
             if not batch.has_next:
                 break
 
             page += 1
-
-    async def _send_update(self, link_updates: Optional[list[LinkUpdate]]) -> None:
-        """Подготовить Update."""
-
-        if link_updates:
-            await self._notifier.notify(link_updates)
 
     async def _get_links_for_notify(self, links: list[GlobalLink]) -> list[LinkUpdate]:
         tasks = [self._check_single_link(link) for link in links]
@@ -119,17 +105,11 @@ class Scheduler:
     ) -> Optional[LinkUpdate]:
         """Обработка одиночной сслыки."""
         chats = await self._service.get_chats_for_link(link.id)
-        if self._use_outbox:
-            update = LinkUpdate(
-                id=link.id, url=str(link.url), description=str(event), tgChatIds=chats
-            )
-            await self._service.save_update_outbox(link.id, event.updated_at, update)
-            return None
-        else:
-            await self._service.update_link_timestamp(link.id, event.updated_at)
-            return LinkUpdate(
-                id=link.id, url=str(link.url), description=str(event), tgChatIds=chats
-            )
+        update = LinkUpdate(
+            id=link.id, url=str(link.url), description=str(event), tgChatIds=chats
+        )
+        await self._service.save_update_outbox(link.id, event.updated_at, update)
+        return None
 
     def _select_client(self, url: str) -> Optional[BaseClient]:
         domain = urlparse(url).netloc.replace("www.", "")
