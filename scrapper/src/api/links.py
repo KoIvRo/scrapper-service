@@ -11,8 +11,12 @@ from models.dto.schemas import (
     Link,
     PaginatedLink,
 )
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from config import settings
 
 links = APIRouter(prefix="/links")
+limiter = Limiter(key_func=get_remote_address)
 
 
 @links.get(
@@ -20,6 +24,7 @@ links = APIRouter(prefix="/links")
     response_model=ListLinksResponse,
     responses={400: {"model": ApiErrorResponse}, 404: {"model": ApiErrorResponse}},
 )
+@limiter.limit(settings.rate_limit_links_get)
 async def get_links(
     page: Optional[int] = 0,
     limit: Optional[int] = 5,
@@ -65,6 +70,7 @@ async def get_links(
 
 
 @links.post("")
+@limiter.limit(settings.rate_limit_links_post)
 async def append_link(
     request: AddLinkRequest, tg_chat_id: int = Header(..., alias="Tg-Chat-Id")
 ):
@@ -96,6 +102,7 @@ async def append_link(
     response_model=LinkResponse,
     responses={400: {"model": ApiErrorResponse}, 404: {"model": ApiErrorResponse}},
 )
+@limiter.limit(settings.rate_limit_links_delete)
 async def delete_link(
     request: RemoveLinkRequest, tg_chat_id: int = Header(..., alias="Tg-Chat-Id")
 ):

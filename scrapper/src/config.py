@@ -51,6 +51,12 @@ class Settings(BaseSettings):
     failure_threshold: int = 2
     recovery_timeout: int = 5
 
+    rate_limit_links_get: str = "30/minute"
+    rate_limit_links_post: str = "10/minute"
+    rate_limit_links_delete: str = "10/minute"
+    rate_limit_chats_post: str = "5/minute"
+    rate_limit_chats_delete: str = "5/minute"
+
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
     )

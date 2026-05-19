@@ -11,12 +11,21 @@ from outbox_processor import OutboxProcessor
 from dependencies.service_factory import get_service
 from dependencies.notifier_factory import get_notifier
 from dependencies.client_factory import get_clients_map
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from logger_config import init_logger
 
 
 sys.path.append(str(Path(__file__).parent))
 
+limiter = Limiter(key_func=get_remote_address)
+
 app = FastAPI()
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.include_router(links)
 app.include_router(chats)
 
