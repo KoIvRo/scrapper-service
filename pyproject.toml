@@ -25,6 +25,7 @@ confluent-kafka = {extras = ["avro"], version = "^2.14.0"}
 avro-python3 = "^1.10.2"
 redis = "^7.4.0"
 tenacity = "^9.1.4"
+aiobreaker = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"

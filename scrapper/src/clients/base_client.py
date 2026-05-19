@@ -1,4 +1,5 @@
 import httpx
+from aiobreaker import CircuitBreaker
 from typing import Optional
 from abc import ABC, abstractmethod
 from validators.validators import BaseUrlValidator
@@ -10,12 +11,17 @@ class BaseClient(ABC):
     """Интерфейс для клиентов."""
 
     def __init__(
-        self, base_url: str, validator: BaseUrlValidator, timeout: httpx.Timeout
+        self,
+        base_url: str,
+        validator: BaseUrlValidator,
+        timeout: httpx.Timeout,
+        cb: CircuitBreaker,
     ) -> None:
         self.base_url = base_url
         self._timeout = timeout
         self._validator = validator
         self._client: Optional[httpx.AsyncClient] = None
+        self._cb: CircuitBreaker = cb
 
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client and not self._client.is_closed:

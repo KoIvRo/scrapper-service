@@ -1,4 +1,5 @@
 import httpx
+from aiobreaker import CircuitBreaker
 from typing import Optional
 from datetime import datetime
 from .base_client import BaseClient
@@ -10,10 +11,17 @@ class GitHubClient(BaseClient):
     """Клиент для гитхаба."""
 
     def __init__(
-        self, token: str, validator: GitHubUrlValidator, timeout: httpx.Timeout
+        self,
+        token: str,
+        validator: GitHubUrlValidator,
+        timeout: httpx.Timeout,
+        cb: CircuitBreaker,
     ) -> None:
         super().__init__(
-            base_url="https://api.github.com", validator=validator, timeout=timeout
+            base_url="https://api.github.com",
+            validator=validator,
+            timeout=timeout,
+            cb=cb,
         )
         self._token = token
 
@@ -34,7 +42,8 @@ class GitHubClient(BaseClient):
             "per_page": 1,
         }
 
-        response = await self._get(
+        response = await self._cb.call_async(
+            self._get,
             f"{self.base_url}/repos/{owner}/{repo}/issues",
             headers=headers,
             params=params,

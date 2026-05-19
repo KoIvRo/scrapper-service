@@ -1,11 +1,11 @@
 import httpx
+from aiobreaker import CircuitBreaker
 from typing import Optional, TypedDict
 from datetime import datetime, timezone
 from .base_client import BaseClient
 from httpx import Response
 from validators.validators import StackOverFlowUrlValidator
 from models.dto.schemas import StackOverFlowEvent
-from .retry_decorator import retry_decorator
 
 
 class AnswersData(TypedDict):
@@ -27,12 +27,16 @@ class StackOverFlowClient(BaseClient):
     """Клиент для stackoverflow."""
 
     def __init__(
-        self, validator: StackOverFlowUrlValidator, timeout: httpx.Timeout
+        self,
+        validator: StackOverFlowUrlValidator,
+        timeout: httpx.Timeout,
+        cb: CircuitBreaker,
     ) -> None:
         super().__init__(
             base_url="https://api.stackexchange.com",
             validator=validator,
             timeout=timeout,
+            cb=cb,
         )
 
     async def get_last_event(self, url: str) -> Optional[StackOverFlowEvent]:
@@ -47,12 +51,12 @@ class StackOverFlowClient(BaseClient):
             "order": "desc",
         }
 
-        response_answers = await self._get(
-            f"{self.base_url}/questions/{question_id}/answers", params=params
+        response_answers = await self._cb.call_async(
+            self._get, f"{self.base_url}/questions/{question_id}/answers", params=params
         )
 
-        response_questions = await self._get(
-            f"{self.base_url}/questions/{question_id}", params=params
+        response_questions = await self._cb.call_async(
+            self._get, f"{self.base_url}/questions/{question_id}", params=params
         )
 
         if (

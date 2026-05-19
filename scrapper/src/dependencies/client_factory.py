@@ -1,4 +1,6 @@
 import httpx
+from aiobreaker import CircuitBreaker
+from datetime import timedelta
 from config import settings
 from typing import Optional
 from clients.base_client import BaseClient
@@ -22,6 +24,11 @@ class ClientFactory:
                 token=settings.github_token.get_secret_value(),
                 validator=GitHubUrlValidator,
                 timeout=self._get_httpx_timeout(),
+                cb=CircuitBreaker(
+                    fail_max=settings.failure_threshold,
+                    timeout_duration=timedelta(seconds=settings.recovery_timeout),
+                    exclude=[httpx.HTTPError, httpx.RequestError],
+                ),
             )
 
         return self._github_client
@@ -31,7 +38,13 @@ class ClientFactory:
 
         if not self._stackoverflow_client:
             self._stackoverflow_client = StackOverFlowClient(
-                validator=StackOverFlowUrlValidator, timeout=self._get_httpx_timeout()
+                validator=StackOverFlowUrlValidator,
+                timeout=self._get_httpx_timeout(),
+                cb=CircuitBreaker(
+                    fail_max=settings.failure_threshold,
+                    timeout_duration=timedelta(seconds=settings.recovery_timeout),
+                    exclude=[httpx.HTTPError, httpx.RequestError],
+                ),
             )
 
         return self._stackoverflow_client

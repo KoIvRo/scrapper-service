@@ -102,7 +102,7 @@ class Scheduler:
             try:
                 event = await client.get_last_event(str(link.url))
             except Exception as e:
-                logger.warning("Client error", extra={"error": e, "url": str(link.url)})
+                logger.warning("Client error", extra={"error": e})
                 return None
 
             if not event:

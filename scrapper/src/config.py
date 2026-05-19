@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     retry_exponential_max_seconds: int = 30
     retryable_status_codes: list[int] = Field(default=[429, 500, 502, 503, 504])
 
+    failure_threshold: int = 2
+    recovery_timeout: int = 5
+
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
     )
