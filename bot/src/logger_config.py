@@ -12,14 +12,14 @@ def init_logger() -> None:
 
     log_handler: logging.Handler
 
-    if settings.logger_output == "stdout":
+    if settings.logger.output == "stdout":
         log_handler = logging.StreamHandler()
     else:
-        log_handler = logging.FileHandler(settings.logger_output, encoding="utf-8")
+        log_handler = logging.FileHandler(settings.logger.output, encoding="utf-8")
 
     log_handler.setFormatter(formatter)
     logger.addHandler(log_handler)
-    logger.setLevel(settings.logger_level)
+    logger.setLevel(settings.logger.level)
 
     logging.getLogger("aiogram").setLevel(logging.WARNING)
     logging.getLogger("aiohttp").setLevel(logging.WARNING)

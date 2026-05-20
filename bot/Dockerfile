@@ -14,5 +14,6 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root --with main
 
-COPY src /app
-CMD ["sh", "-c", "sleep 5 && poetry run python main.py"]
+COPY src /app/src
+COPY config.yml /app
+CMD ["sh", "-c", "sleep 5 && poetry run python src/main.py"]

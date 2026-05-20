@@ -1,37 +1,63 @@
+import yaml
 from pathlib import Path
-from typing import Optional
-from pydantic import SecretStr
+from pydantic import BaseModel, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class KafkaSettings(BaseModel):
+    """Настройки для kafka."""
+
+    topic: str
+    bootstrap_servers: str
+    consumer_group: str
+    schema_registry_url: str
+
+
+class HTTPSettings(BaseModel):
+    """Настройка для http."""
+
+    host: str
+    port: int
+    scrapper_url: str
+
+
+class LoggerSettings(BaseModel):
+    """Найстройка логгера."""
+
+    level: str
+    output: str
+
+
+class TimeoutSettings(BaseModel):
+    """Настройка timeout."""
+
+    connect: int
+    read: int
+    write: int
+    pool: int
 
 
 class Settings(BaseSettings):
     """Базовый класс настроек pydantic."""
 
-    host: Optional[str] = None
-    port: Optional[int] = None
-
-    scrapper_url: Optional[str] = None
+    kafka: KafkaSettings
+    http: HTTPSettings
+    logger: LoggerSettings
+    timeout: TimeoutSettings
 
     bot_token: SecretStr
-
-    logger_level: str = "INFO"
-    logger_output: str = "stdout"
-
-    kafka_bootstrap_servers: Optional[str] = None
-    kafka_topic: str = "link_updates"
-    kafka_consumer_group: str = "bot-consumer-group"
-
-    schema_registry_url: Optional[str] = None
-
-    timeout_connect: Optional[int] = None
-    timeout_read: Optional[int] = None
-    timeout_write: Optional[int] = None
-    timeout_pool: Optional[int] = None
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
     )
 
 
-# Инициализируем общие настройки
-settings = Settings()
+def load_config() -> Settings:
+    """Загрузка конфига."""
+
+    with open(Path(__file__).parent.parent / "config.yml", "r") as f:
+        data = yaml.safe_load(f)
+    return Settings(**data)
+
+
+settings = load_config()

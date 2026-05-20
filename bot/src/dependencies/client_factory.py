@@ -1,3 +1,4 @@
+import httpx
 from config import settings
 from client.base_client import BaseClient
 from client.scrapper_client import ScrapperClient
@@ -12,7 +13,15 @@ class ClientFactory:
     def get_client(self) -> BaseClient:
         """Получение клиента."""
         if self._client is None:
-            self._client = ScrapperClient(settings.scrapper_url)
+            self._client = ScrapperClient(
+                settings.http.scrapper_url,
+                timeout=httpx.Timeout(
+                    connect=settings.timeout.connect,
+                    read=settings.timeout.read,
+                    write=settings.timeout.write,
+                    pool=settings.timeout.pool,
+                ),
+            )
 
         return self._client
 

@@ -1,13 +1,12 @@
 from typing import Optional
 from httpx import AsyncClient, Timeout
 from models.schemas import ListLinksResponse
-from config import settings
 
 
 class ScrapperClient:
     """Клиент для scrapper-service."""
 
-    def __init__(self, base_url: str, timeout: int = 10) -> None:
+    def __init__(self, base_url: str, timeout: Timeout) -> None:
         self.base_url = base_url
         self._client: Optional[AsyncClient] = None
         self._timeout = timeout
@@ -109,13 +108,6 @@ class ScrapperClient:
         """Получить клиента."""
 
         if not self._client:
-            self._client = AsyncClient(
-                timeout=Timeout(
-                    connect=settings.timeout_connect,
-                    read=settings.timeout_read,
-                    write=settings.timeout_write,
-                    pool=settings.timeout_pool,
-                )
-            )
+            self._client = AsyncClient(timeout=self._timeout)
 
         return self._client

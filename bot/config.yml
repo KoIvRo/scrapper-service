@@ -1,0 +1,20 @@
+http:
+  host: 0.0.0.0
+  port: 8000
+  scrapper_url: http://scrapper:8001
+
+kafka:
+  bootstrap_servers: localhost:9092,localhost:9093,localhost:9094
+  topic: link-updates
+  consumer_group: bot-consumer-group
+  schema_registry_url: http://localhost:8081
+
+logger:
+  level: INFO
+  output: stdout
+
+timeout:
+  connect: 2
+  read: 3
+  write: 3
+  pool: 2
