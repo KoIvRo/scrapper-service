@@ -26,7 +26,6 @@ Run linters and tests:
       apt-get update && apt-get install -y curl docker-cli
       curl -sSL https://install.python-poetry.org | python -
       poetry install --no-root --with dev
-      echo "$CI_JOB_TOKEN" | docker login gitlab.education.tbank.ru:443 -u gitlab-ci-token --password-stdin
   script:
     - | 
       poetry run black --check .

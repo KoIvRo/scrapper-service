@@ -245,3 +245,25 @@ async def test_cache_invalidation_on_delete(docker_services):
             headers={"Tg-Chat-Id": "333"},
         )
         assert len(r2.json()["links"]) == len_before - 1
+
+
+@pytest.mark.asyncio
+async def test_rate_limit_exceeded_returns_429(docker_services):
+    """При превышении лимита возвращается HTTP 429."""
+    scrapper_url = docker_services["scrapper_url"]
+
+    async with httpx.AsyncClient() as client:
+        await client.post(f"{scrapper_url}/tg-chat/123")
+        for _ in range(10):
+            r = await client.post(
+                f"{scrapper_url}/links",
+                headers={"Tg-Chat-Id": "123"},
+                json={"link": "https://github.com/user/repo", "tags": ["rl"]},
+            )
+
+        r = await client.post(
+            f"{scrapper_url}/links",
+            headers={"Tg-Chat-Id": "123"},
+            json={"link": "https://github.com/user/repo", "tags": ["rl"]},
+        )
+        assert r.status_code == 429
