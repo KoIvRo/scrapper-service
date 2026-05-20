@@ -64,7 +64,7 @@ class Scheduler:
             if not batch.items:
                 break
 
-            links_to_notify = await self._get_links_for_notify(batch.items)
+            await self._get_links_for_notify(batch.items)
 
             if not batch.has_next:
                 break

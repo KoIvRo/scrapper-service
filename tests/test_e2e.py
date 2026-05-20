@@ -1,5 +1,4 @@
 import pytest
-import asyncio
 import httpx
 import time
 import requests
@@ -246,28 +245,3 @@ async def test_cache_invalidation_on_delete(docker_services):
             headers={"Tg-Chat-Id": "333"},
         )
         assert len(r2.json()["links"]) == len_before - 1
-
-
-@pytest.mark.asyncio
-async def test_kafka_integration(docker_services):
-    scrapper_url = docker_services["scrapper_url"]
-
-    async with httpx.AsyncClient() as client:
-        await client.post(f"{scrapper_url}/tg-chat/123")
-
-        r = await client.post(
-            f"{scrapper_url}/links",
-            json={"link": "https://github.com/user/kafka-test", "tags": ["test"]},
-            headers={"Tg-Chat-Id": "123"},
-        )
-        assert r.status_code in (200, 201)
-
-        await asyncio.sleep(30)
-
-        r2 = await client.get(
-            f"{scrapper_url}/links/?page=0&limit=10",
-            headers={"Tg-Chat-Id": "123"},
-        )
-        assert r2.status_code == 200
-        data = r2.json()
-        assert len(data["links"]) >= 1

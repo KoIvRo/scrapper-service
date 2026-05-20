@@ -1,6 +1,8 @@
 import os
 import sys
 import pytest
+import httpx
+from aiobreaker import CircuitBreaker
 from pathlib import Path
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -33,6 +35,39 @@ from clients.github_client import GitHubClient
 from dependencies.client_factory import ClientFactory
 from models.dto.schemas import LinkUpdate
 from notifier.kafka_notifier import KafkaNotifier
+
+
+@pytest.fixture
+def mock_timeout():
+    """Таймаут для тестов."""
+    return httpx.Timeout(connect=1.0, read=1.0, write=1.0, pool=1.0)
+
+
+@pytest.fixture
+def mock_circuit_breaker():
+    """Circuit Breaker для тестов."""
+    return CircuitBreaker(fail_max=3, timeout_duration=3)
+
+
+@pytest.fixture
+def github_client(github_token, mock_timeout, mock_circuit_breaker):
+    """Клиент GitHub."""
+    return GitHubClient(
+        token=github_token,
+        validator=GitHubUrlValidator(),
+        timeout=mock_timeout,
+        cb=mock_circuit_breaker,
+    )
+
+
+@pytest.fixture
+def stackoverflow_client(mock_timeout, mock_circuit_breaker):
+    """Клиент StackOverflow."""
+    return StackOverFlowClient(
+        validator=StackOverFlowUrlValidator(),
+        timeout=mock_timeout,
+        cb=mock_circuit_breaker,
+    )
 
 
 @pytest.fixture
@@ -170,7 +205,7 @@ def another_link():
         url="https://stackoverflow.com/questions/123",
         chat_id=456,
         tags=[],
-        updated_at=datetime(2024, 1, 1, 11, 0, 0),
+        updated_at=datetime(2026, 1, 1, 11, 0, 0),
     )
 
 
@@ -182,7 +217,7 @@ def sample_link():
         url="https://github.com/user/repo",
         chat_id=123,
         tags=["work"],
-        updated_at=datetime(2024, 1, 1, 10, 0, 0),
+        updated_at=datetime(2026, 1, 1, 10, 0, 0),
     )
 
 
@@ -220,18 +255,6 @@ def github_token():
 
 
 @pytest.fixture
-def github_client(github_token):
-    """Клиент GitHub."""
-    return GitHubClient(github_token, GitHubUrlValidator)
-
-
-@pytest.fixture
-def stackoverflow_client():
-    """Клиент StackOverflow."""
-    return StackOverFlowClient(StackOverFlowUrlValidator)
-
-
-@pytest.fixture
 def mock_httpx_client():
     """Мок HTTPX клиента."""
     mock_client = AsyncMock()
@@ -254,7 +277,7 @@ def sample_github_response():
         "id": 123456,
         "name": "repo",
         "full_name": "owner/repo",
-        "updated_at": "2024-01-15T10:30:00Z",
+        "updated_at": "2026-01-15T10:30:00Z",
     }
 
 
@@ -277,7 +300,9 @@ def valid_github_link():
 @pytest.fixture
 def mock_cache():
     """Мок CacheManager."""
-    cache = MagicMock(spec=CacheManager)  # noqa
+    from cache.cache_manager import CacheManager
+
+    cache = MagicMock(spec=CacheManager)
     cache.get_cache_links = AsyncMock(return_value=None)
     cache.save_cache_links = AsyncMock()
     cache.delete_cache_links = AsyncMock()

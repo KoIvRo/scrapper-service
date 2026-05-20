@@ -28,7 +28,6 @@ class TestScheduler:
         scheduler = Scheduler(
             service=mock_service,
             clients_map={"other.com": mock_client},
-            notifier=mock_notifier,
         )
 
         result = await scheduler._get_links_for_notify([link])
@@ -44,7 +43,6 @@ class TestScheduler:
         scheduler = Scheduler(
             service=mock_service,
             clients_map={"example.com": mock_client},
-            notifier=mock_notifier,
         )
 
         result = scheduler._needs_update(link, datetime(2024, 1, 2, 10, 0, 0))
@@ -61,9 +59,7 @@ class TestScheduler:
         )
 
         scheduler = Scheduler(
-            service=mock_service,
-            clients_map={"example.com": mock_client},
-            notifier=mock_notifier,
+            service=mock_service, clients_map={"example.com": mock_client}
         )
 
         result = scheduler._needs_update(link, datetime(2024, 1, 1, 10, 0, 0))
@@ -76,7 +72,6 @@ class TestScheduler:
         scheduler = Scheduler(
             service=mock_service,
             clients_map={"example.com": mock_client},
-            notifier=mock_notifier,
         )
 
         result = scheduler._select_client("https://example.com")
@@ -91,7 +86,6 @@ class TestScheduler:
         scheduler = Scheduler(
             service=mock_service,
             clients_map={"example.com": mock_client},
-            notifier=mock_notifier,
         )
 
         result = scheduler._select_client("https://other.com")
@@ -113,7 +107,6 @@ class TestScheduler:
         scheduler = Scheduler(
             service=mock_service,
             clients_map={"example.com": mock_client},
-            notifier=mock_notifier,
         )
 
         result = await scheduler._check_single_link(link)
@@ -139,7 +132,6 @@ class TestScheduler:
         scheduler = Scheduler(
             service=mock_service,
             clients_map={"example.com": mock_client},
-            notifier=mock_notifier,
         )
 
         result = await scheduler._check_single_link(link)

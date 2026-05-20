@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, Literal
+from typing import Optional
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -22,6 +22,11 @@ class Settings(BaseSettings):
     kafka_consumer_group: str = "bot-consumer-group"
 
     schema_registry_url: Optional[str] = None
+
+    timeout_connect: Optional[int] = None
+    timeout_read: Optional[int] = None
+    timeout_write: Optional[int] = None
+    timeout_pool: Optional[int] = None
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"

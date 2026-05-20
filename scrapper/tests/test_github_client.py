@@ -19,7 +19,7 @@ class TestGitHubClient:
                     "html_url": "https://github.com/owner/repo/issues/1",
                     "title": "Test issue",
                     "user": {"login": "test_user"},
-                    "updated_at": "2024-01-15T10:30:00Z",
+                    "updated_at": "2026-01-15T10:30:00Z",
                     "body": "Test body content",
                 }
             ]
@@ -34,7 +34,7 @@ class TestGitHubClient:
         assert result.author == "test_user"
         assert result.url == "https://github.com/owner/repo/issues/1"
         assert result.preview.startswith("Test body")
-        assert result.updated_at.year == 2024
+        assert result.updated_at.year == 2026
 
     @pytest.mark.asyncio
     async def test_get_last_event_empty_response(

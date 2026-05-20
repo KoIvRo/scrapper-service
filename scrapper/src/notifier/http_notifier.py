@@ -23,12 +23,14 @@ class HTTPNotifier(BaseNotifier):
         """Получение клиента."""
 
         if not self._client:
-            self._client = httpx.AsyncClient(timeout=httpx.Timeout(
-            connect=settings.timeout_connect,
-            read=settings.timeout_read,
-            write=settings.timeout_write,
-            pool=settings.timeout_pool,
-        ))
+            self._client = httpx.AsyncClient(
+                timeout=httpx.Timeout(
+                    connect=settings.timeout_connect,
+                    read=settings.timeout_read,
+                    write=settings.timeout_write,
+                    pool=settings.timeout_pool,
+                )
+            )
 
         return self._client
 

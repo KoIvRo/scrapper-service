@@ -1,6 +1,7 @@
 from typing import Optional
-from httpx import AsyncClient
+from httpx import AsyncClient, Timeout
 from models.schemas import ListLinksResponse
+from config import settings
 
 
 class ScrapperClient:
@@ -68,8 +69,8 @@ class ScrapperClient:
         payload: dict[str, str | list] = {
             "link": url,
             "tags": tags or [],
-            "filters": [],
-        }  # пока не используем
+            "filters": [],  # пока не используем
+        }
 
         try:
             response = await client.post(
@@ -108,6 +109,13 @@ class ScrapperClient:
         """Получить клиента."""
 
         if not self._client:
-            self._client = AsyncClient(timeout=self._timeout)
+            self._client = AsyncClient(
+                timeout=Timeout(
+                    connect=settings.timeout_connect,
+                    read=settings.timeout_read,
+                    write=settings.timeout_write,
+                    pool=settings.timeout_pool,
+                )
+            )
 
         return self._client

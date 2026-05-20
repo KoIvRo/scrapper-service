@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock, patch
 
-from notifier.bot_notifier import BotNotifier
+from notifier.http_notifier import HTTPNotifier
 from models.dto.schemas import LinkUpdate
 
 
@@ -25,10 +25,10 @@ class TestNotifier:
         assert update.tgChatIds == [sample_link.chat_id]
 
     @pytest.mark.asyncio
-    async def test_send_request_success(self, sample_link):
+    async def test_send_request_success(self, sample_link, mock_circuit_breaker):
         """Тест успешной отправки запроса."""
 
-        notifier = BotNotifier("http://bot:8000")
+        notifier = HTTPNotifier("http://bot:8000", mock_circuit_breaker)
 
         mock_response = AsyncMock()
         mock_response.status_code = 200
@@ -54,10 +54,12 @@ class TestNotifier:
             assert kwargs["json"]["url"] == str(sample_link.url)
 
     @pytest.mark.asyncio
-    async def test_notify_multiple_links(self, sample_link, another_link):
+    async def test_notify_multiple_links(
+        self, sample_link, another_link, mock_circuit_breaker
+    ):
         """Тест отправки нескольких уведомлений."""
 
-        notifier = BotNotifier("http://bot:8000")
+        notifier = HTTPNotifier("http://bot:8000", mock_circuit_breaker)
 
         with patch.object(notifier, "_send_request", new=AsyncMock()) as mock_send:
             await notifier.notify(
@@ -80,10 +82,10 @@ class TestNotifier:
             assert mock_send.call_count == 2
 
     @pytest.mark.asyncio
-    async def test_notify_empty_list(self):
+    async def test_notify_empty_list(self, mock_circuit_breaker):
         """Тест отправки пустого списка."""
 
-        notifier = BotNotifier("http://bot:8000")
+        notifier = HTTPNotifier("http://bot:8000", mock_circuit_breaker)
 
         with patch.object(notifier, "_send_request", new=AsyncMock()) as mock_send:
             await notifier.notify([])
@@ -91,10 +93,10 @@ class TestNotifier:
             mock_send.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_get_client_lazy_initialization(self):
+    async def test_get_client_lazy_initialization(self, mock_circuit_breaker):
         """Тест ленивой инициализации клиента."""
 
-        notifier = BotNotifier("http://bot:8000")
+        notifier = HTTPNotifier("http://bot:8000", mock_circuit_breaker)
 
         assert notifier._client is None
 

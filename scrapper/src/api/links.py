@@ -26,7 +26,7 @@ limiter = Limiter(key_func=get_remote_address)
 )
 @limiter.limit(settings.rate_limit_links_get)
 async def get_links(
-    request: Request, # noqa
+    request: Request,  # noqa
     page: Optional[int] = 0,
     limit: Optional[int] = 5,
     tg_chat_id: int = Header(..., alias="Tg-Chat-Id"),
@@ -73,7 +73,7 @@ async def get_links(
 @links.post("")
 @limiter.limit(settings.rate_limit_links_post)
 async def append_link(
-    request: Request, # noqa
+    request: Request,  # noqa
     add_request: AddLinkRequest,
     tg_chat_id: int = Header(..., alias="Tg-Chat-Id"),
 ):
@@ -107,7 +107,7 @@ async def append_link(
 )
 @limiter.limit(settings.rate_limit_links_delete)
 async def delete_link(
-    request: Request, # noqa
+    request: Request,  # noqa
     remove_request: RemoveLinkRequest,
     tg_chat_id: int = Header(..., alias="Tg-Chat-Id"),
 ):
@@ -116,7 +116,9 @@ async def delete_link(
     service = get_service()
 
     try:
-        link = await service.delete_link(chat_id=tg_chat_id, url=str(remove_request.link))
+        link = await service.delete_link(
+            chat_id=tg_chat_id, url=str(remove_request.link)
+        )
         return LinkResponse(id=link.id, url=link.url, tags=link.tags, filters=[])
     except ScrapperServiceError as e:
         raise HTTPException(
