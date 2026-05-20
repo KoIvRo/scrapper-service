@@ -25,10 +25,10 @@ async def run_consumer() -> None:
     """Запуск консьюмера."""
 
     consumer = KafkaConsumer(
-        bootstrap_servers=settings.kafka.bootstrap_servers,
-        topic=settings.kafka.topic,
-        group_id=settings.kafka.consumer_group,
-        schema_registry_url=settings.kafka.schema_registry_url,
+        bootstrap_servers=settings.kafka_bootstrap_servers,
+        topic=settings.kafka_topic,
+        group_id=settings.kafka_consumer_group,
+        schema_registry_url=settings.kafka_schema_registry_url,
     )
     await consumer.start()
 

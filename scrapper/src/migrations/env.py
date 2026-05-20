@@ -21,7 +21,7 @@ if config.config_file_name is not None:
 
 config.set_main_option(
     "sqlalchemy.url",
-    f"postgresql+asyncpg://{settings.postgres.user}:{settings.postgres.password.get_secret_value()}@{settings.postgres.host}:{settings.postgres.port}/{settings.postgres.db}"
+    f"postgresql+asyncpg://{settings.postgres_user}:{settings.postgres_password.get_secret_value()}@{settings.postgres_host}:{settings.postgres_port}/{settings.postgres_db}"
     + "?async_fallback=True",
 )
 

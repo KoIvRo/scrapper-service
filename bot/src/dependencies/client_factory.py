@@ -14,7 +14,7 @@ class ClientFactory:
         """Получение клиента."""
         if self._client is None:
             self._client = ScrapperClient(
-                settings.service.scrapper_url,
+                settings.scrapper_url,
                 timeout=httpx.Timeout(
                     connect=settings.timeout.connect,
                     read=settings.timeout.read,

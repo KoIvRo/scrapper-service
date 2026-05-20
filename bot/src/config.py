@@ -2,15 +2,7 @@ import yaml
 from pathlib import Path
 from pydantic import BaseModel, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-class KafkaSettings(BaseModel):
-    """Настройки для kafka."""
-
-    topic: str
-    bootstrap_servers: str
-    consumer_group: str
-    schema_registry_url: str
+from typing import Optional
 
 
 class ServiceSettings(BaseModel):
@@ -18,7 +10,6 @@ class ServiceSettings(BaseModel):
 
     host: str
     port: int
-    scrapper_url: str
 
 
 class LoggerSettings(BaseModel):
@@ -39,13 +30,18 @@ class TimeoutSettings(BaseModel):
 
 class Settings(BaseSettings):
     """Базовый класс настроек pydantic."""
-
-    kafka: KafkaSettings
     service: ServiceSettings
     logger: LoggerSettings
     timeout: TimeoutSettings
 
     bot_token: SecretStr
+
+    scrapper_url: Optional[str] = None
+
+    kafka_topic: Optional[str] = None
+    kafka_bootstrap_servers: Optional[str] = None
+    kafka_consumer_group: Optional[str] = None
+    kafka_schema_registry_url: Optional[str] = None
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
