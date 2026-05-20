@@ -13,7 +13,7 @@ class KafkaSettings(BaseModel):
     schema_registry_url: str
 
 
-class HTTPSettings(BaseModel):
+class ServiceSettings(BaseModel):
     """Настройка для http."""
 
     host: str
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     """Базовый класс настроек pydantic."""
 
     kafka: KafkaSettings
-    http: HTTPSettings
+    service: ServiceSettings
     logger: LoggerSettings
     timeout: TimeoutSettings
 

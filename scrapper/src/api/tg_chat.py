@@ -15,7 +15,7 @@ limiter = Limiter(get_remote_address)
     "/{id}",
     responses={400: {"model": ApiErrorResponse}, 409: {"model": ApiErrorResponse}},
 )
-@limiter.limit(settings.rate_limit_chats_post)
+@limiter.limit(settings.rate_limit.chats_post)
 async def append_chat(request: Request, id: int) -> dict:
     """Добавление чата."""
 
@@ -42,7 +42,7 @@ async def append_chat(request: Request, id: int) -> dict:
     "/{id}",
     responses={400: {"model": ApiErrorResponse}, 404: {"model": ApiErrorResponse}},
 )
-@limiter.limit(settings.rate_limit_links_delete)
+@limiter.limit(settings.rate_limit.links_delete)
 async def delete_chat(request: Request, id: int) -> dict:
     """Удаление чата."""
 

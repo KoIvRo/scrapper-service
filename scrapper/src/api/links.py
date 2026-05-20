@@ -24,7 +24,7 @@ limiter = Limiter(key_func=get_remote_address)
     response_model=ListLinksResponse,
     responses={400: {"model": ApiErrorResponse}, 404: {"model": ApiErrorResponse}},
 )
-@limiter.limit(settings.rate_limit_links_get)
+@limiter.limit(settings.rate_limit.links_get)
 async def get_links(
     request: Request,  # noqa
     page: Optional[int] = 0,
@@ -71,7 +71,7 @@ async def get_links(
 
 
 @links.post("")
-@limiter.limit(settings.rate_limit_links_post)
+@limiter.limit(settings.rate_limit.links_post)
 async def append_link(
     request: Request,  # noqa
     add_request: AddLinkRequest,
@@ -105,7 +105,7 @@ async def append_link(
     response_model=LinkResponse,
     responses={400: {"model": ApiErrorResponse}, 404: {"model": ApiErrorResponse}},
 )
-@limiter.limit(settings.rate_limit_links_delete)
+@limiter.limit(settings.rate_limit.links_delete)
 async def delete_link(
     request: Request,  # noqa
     remove_request: RemoveLinkRequest,

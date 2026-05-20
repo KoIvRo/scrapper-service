@@ -25,8 +25,8 @@ class ClientFactory:
                 validator=GitHubUrlValidator,
                 timeout=self._get_httpx_timeout(),
                 cb=CircuitBreaker(
-                    fail_max=settings.failure_threshold,
-                    timeout_duration=timedelta(seconds=settings.recovery_timeout),
+                    fail_max=settings.circuit_breaker.failure_threshold,
+                    timeout_duration=timedelta(seconds=settings.circuit_breaker.recovery_timeout),
                     exclude=[httpx.HTTPError, httpx.RequestError],
                 ),
             )
@@ -41,8 +41,8 @@ class ClientFactory:
                 validator=StackOverFlowUrlValidator,
                 timeout=self._get_httpx_timeout(),
                 cb=CircuitBreaker(
-                    fail_max=settings.failure_threshold,
-                    timeout_duration=timedelta(seconds=settings.recovery_timeout),
+                    fail_max=settings.circuit_breaker.failure_threshold,
+                    timeout_duration=timedelta(seconds=settings.circuit_breaker.recovery_timeout),
                     exclude=[httpx.HTTPError, httpx.RequestError],
                 ),
             )
@@ -64,10 +64,10 @@ class ClientFactory:
     def _get_httpx_timeout(self) -> httpx.Timeout:
         """Созадать timeout объект."""
         return httpx.Timeout(
-            connect=settings.timeout_connect,
-            read=settings.timeout_read,
-            write=settings.timeout_write,
-            pool=settings.timeout_pool,
+            connect=settings.timeout.connect,
+            read=settings.timeout.read,
+            write=settings.timeout.write,
+            pool=settings.timeout.pool,
         )
 
 

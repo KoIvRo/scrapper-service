@@ -1,64 +1,121 @@
+import yaml
 from pathlib import Path
 from typing import Optional, Literal
-from pydantic import SecretStr, Field
+from pydantic import SecretStr, BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class ServiceSettings(BaseModel):
+    """Настройки scrapper."""
+
+    host: str
+    port: int
+    access_type: Literal["orm", "raw"]
+
+
+class RateLimitSettings(BaseModel):
+    """Настройка RateLimit."""
+
+    links_get: str
+    links_post: str
+    links_delete: str
+    chats_post: str
+    chats_delete: str
+
+class LoggerSettings(BaseModel):
+    """Настройка логгера."""
+
+    level: str
+    output: str
+
+
+class ConcurrencySettings(BaseModel):
+    """Настройки асинхронности."""
+
+    batch_size: int
+    update_time: int
+    concurrency_links: int
+
+class TimeoutSettings(BaseModel):
+    """Настрйока Timeout."""
+
+    connect: int
+    read: int
+    write: int
+    pool: int
+
+
+class RetrySettings(BaseModel):
+    """Настройка retry."""
+
+    max_attempts: int
+    exponential_multiplier: int
+    exponential_min_seconds: int
+    exponential_max_seconds: int
+    status_codes: list[int]
+
+
+class CircuitBreakerSettings(BaseModel):
+    """Настройка CircuitBreaker."""
+
+    failure_threshold: int
+    recovery_timeout: int
+
+class OutboxSettings(BaseModel):
+    """Настройка Outbox."""
+
+    cleanup_interval: int
+    days_to_truncate: int
+    update_time: int
+
+class ValkeySettings(BaseModel):
+    """Настройка Valkey."""
+
+    ttl: int
 
 
 class Settings(BaseSettings):
     """Базовый класс настроек pydantic."""
 
-    host: Optional[str] = None
-    port: Optional[int] = None
-    access_type: Optional[Literal["mem", "raw", "orm"]] = None
-    bot_url: Optional[str] = None
-
-    postgres_db: Optional[str] = None
-    postgres_user: Optional[str] = None
-    postgres_host: Optional[str] = None
-    postgres_port: Optional[int] = None
-    postgres_password: Optional[SecretStr] = None
-
-    kafka_bootstrap_servers: Optional[str] = None
-    kafka_topic: str = "link-updates"
+    service: ServiceSettings
+    rate_limit: RateLimitSettings
+    retry: RetrySettings
+    circuit_breaker: CircuitBreakerSettings
+    timeout: TimeoutSettings
+    concurrency: ConcurrencySettings
+    logger: LoggerSettings
+    outbox: OutboxSettings
+    valkey: ValkeySettings
 
     github_token: Optional[SecretStr] = None
 
-    logger_level: str = "INFO"
-    logger_output: str = "stdout"
+    bot_url: Optional[str] = None
 
-    batch_size: int = 100
-    update_time: int = 10
-    concurrency_links: int = 20
+    kafka_topic: Optional[str] = None
+    kafka_bootstrap_servers: Optional[str] = None
+    kafka_schema_registry_url: Optional[str] = None
 
-    schema_registry_url: Optional[str] = None
+    valkey_host: Optional[str]
+    valkey_port: Optional[str]
 
-    valkey_host: Optional[str] = None
-    valkey_port: Optional[int] = None
-    valkey_ttl: Optional[int] = None
+    postgres_host: Optional[str]
+    postgres_port: Optional[int]
+    postgres_db: Optional[str]
+    postgres_user: Optional[str]
+    postgres_password: SecretStr
 
-    timeout_connect: int = 5
-    timeout_read: int = 5
-    timeout_write: int = 5
-    timeout_pool: int = 3
-
-    retry_max_attempts: int = 5
-    retry_exponential_multiplier: int = 3
-    retry_exponential_min_seconds: int = 1
-    retry_exponential_max_seconds: int = 30
-    retryable_status_codes: list[int] = Field(default=[429, 500, 502, 503, 504])
-
-    failure_threshold: int = 2
-    recovery_timeout: int = 5
-
-    rate_limit_links_get: str = "30/minute"
-    rate_limit_links_post: str = "10/minute"
-    rate_limit_links_delete: str = "10/minute"
-    rate_limit_chats_post: str = "5/minute"
-    rate_limit_chats_delete: str = "5/minute"
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
     )
 
 
-settings = Settings()
+def load_config() -> Settings:
+    """Загрузка конфига."""
+
+    with open(Path(__file__).parent.parent / "config.yml", "r") as f:
+        data = yaml.safe_load(f)
+    
+    return Settings(**data)
+
+settings = load_config()

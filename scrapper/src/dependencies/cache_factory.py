@@ -12,7 +12,7 @@ class CacheManagerFactory:
         """Инициализация CacheManager."""
         if self._cache_manager is None:
             self._cache_manager = CacheManager(
-                settings.valkey_host, settings.valkey_port, settings.valkey_ttl
+                settings.valkey_host, settings.valkey_port, settings.valkey.ttl
             )
 
         return self._cache_manager

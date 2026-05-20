@@ -1,0 +1,45 @@
+service:
+  host: 0.0.0.0
+  port: 8001
+  access_type: raw
+
+rate_limit:
+  links_get: 30/minute
+  links_post: 10/minute
+  links_delete: 10/minute
+  chats_post: 5/minute
+  chats_delete: 5/minute
+
+logger:
+  level: INFO
+  output: stdout
+
+concurrency:
+  batch_size: 100
+  update_time: 10
+  concurrency_links: 10
+
+outbox:
+  cleanup_interval: 3600
+  update_time: 1
+  days_to_truncate: 1
+
+timeout:
+  connect: 5
+  read: 5
+  write: 5
+  pool: 5
+
+retry:
+  max_attempts: 5
+  exponential_multiplier: 1.0
+  exponential_min_seconds: 1.0
+  exponential_max_seconds: 30.0
+  status_codes: [429,500,502,503,504]
+
+circuit_breaker:
+  failure_threshold: 2
+  recovery_timeout: 5
+
+valkey:
+  ttl: 300

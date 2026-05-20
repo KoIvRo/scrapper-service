@@ -18,9 +18,9 @@ class Scheduler:
         self,
         service: BaseService,
         clients_map: dict[str, BaseClient],
-        update_time: int = settings.update_time,
-        batch_size: int = settings.batch_size,
-        concurrency: int = settings.concurrency_links,
+        update_time: int = settings.concurrency.update_time,
+        batch_size: int = settings.concurrency.batch_size,
+        concurrency: int = settings.concurrency.concurrency_links,
     ) -> None:
         self._service = service
         self._clients_map = clients_map

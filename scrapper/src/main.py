@@ -33,7 +33,7 @@ app.include_router(chats)
 async def run_api() -> None:
     """Запуск веб-сервера."""
 
-    config = uvicorn.Config(app, host=settings.host, port=settings.port)
+    config = uvicorn.Config(app, host=settings.service.host, port=settings.service.port)
     server = uvicorn.Server(config)
     await server.serve()
 

@@ -15,10 +15,10 @@ class OutboxProcessor:
         service: BaseService,
         base_notifier: BaseNotifier,
         reserve_notifier: BaseNotifier,
-        batch_size: int = settings.batch_size,
-        update_time: int = 1,
-        cleanup_interval: int = 3600,
-        days_to_truncate: int = 1,
+        batch_size: int = settings.concurrency.batch_size,
+        update_time: int = settings.outbox.update_time,
+        cleanup_interval: int = settings.outbox.cleanup_interval,
+        days_to_truncate: int = settings.outbox.days_to_truncate,
     ) -> None:
         self._service = service
         self._base_notifier = base_notifier

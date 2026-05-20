@@ -27,7 +27,7 @@ class RepositoryFactory:
         db = settings.postgres_db
         password = settings.postgres_password.get_secret_value()
 
-        if settings.access_type == "orm":
+        if settings.service.access_type == "orm":
             self._repository = OrmRepository(
                 host=host, port=port, user=user, db=db, password=password
             )

@@ -39,7 +39,7 @@ class NotifierFactory:
         return KafkaNotifier(
             bootstrap_servers=settings.kafka_bootstrap_servers,
             topic=settings.kafka_topic,
-            schema_registry_url=settings.schema_registry_url,
+            schema_registry_url=settings.kafka_schema_registry_url,
         )
 
     def _create_http_notifier(self) -> BaseNotifier:
@@ -47,8 +47,8 @@ class NotifierFactory:
         return HTTPNotifier(
             settings.bot_url,
             cb=CircuitBreaker(
-                fail_max=settings.failure_threshold,
-                timeout_duration=timedelta(seconds=settings.recovery_timeout),
+                fail_max=settings.circuit_breaker.failure_threshold,
+                timeout_duration=timedelta(seconds=settings.circuit_breaker.recovery_timeout),
                 exclude=[httpx.HTTPError, httpx.RequestError],
             ),
         )

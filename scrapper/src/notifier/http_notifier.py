@@ -25,10 +25,10 @@ class HTTPNotifier(BaseNotifier):
         if not self._client:
             self._client = httpx.AsyncClient(
                 timeout=httpx.Timeout(
-                    connect=settings.timeout_connect,
-                    read=settings.timeout_read,
-                    write=settings.timeout_write,
-                    pool=settings.timeout_pool,
+                    connect=settings.timeout.connect,
+                    read=settings.timeout.read,
+                    write=settings.timeout.write,
+                    pool=settings.timeout.pool,
                 )
             )
 

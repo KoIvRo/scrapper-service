@@ -16,7 +16,7 @@ async def run_api() -> None:
     """Запуск веб сервера."""
     app = FastAPI()
     app.include_router(update)
-    config = uvicorn.Config(app, host=settings.http.host, port=settings.http.port)
+    config = uvicorn.Config(app, host=settings.service.host, port=settings.service.port)
     server = uvicorn.Server(config)
     await server.serve()
 
