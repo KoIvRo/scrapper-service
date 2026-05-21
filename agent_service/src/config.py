@@ -7,7 +7,9 @@ from pydantic_settings import BaseSettings
 class FiltersSettings(BaseModel):
     """Класс настройка для фильтров."""
 
-    authors: list
+    authors: list[str]
+    min_length: int
+    stop_words: list[str]
 
 
 class KafkaConsumerSettings(BaseModel):
