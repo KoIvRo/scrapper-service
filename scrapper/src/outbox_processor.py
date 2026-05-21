@@ -14,7 +14,7 @@ class OutboxProcessor:
         self,
         service: BaseService,
         base_notifier: BaseNotifier,
-        reserve_notifier: BaseNotifier,
+        #reserve_notifier: BaseNotifier,
         batch_size: int = settings.concurrency.batch_size,
         update_time: int = settings.outbox.update_time,
         cleanup_interval: int = settings.outbox.cleanup_interval,
@@ -22,7 +22,7 @@ class OutboxProcessor:
     ) -> None:
         self._service = service
         self._base_notifier = base_notifier
-        self._reserve_notifier = reserve_notifier
+        #self._reserve_notifier = reserve_notifier
         self._batch_size = batch_size
         self._update_time = update_time
         self._running: bool = False
@@ -61,15 +61,24 @@ class OutboxProcessor:
         if updates:
             logger.info("Have updates", extra={"count": len(updates)})
 
+            """Код использовался когда http был запасным транспортом."""
+            # try:
+            #     await self._base_notifier.notify(updates)
+            # except Exception as e:
+            #     logger.warning("HTTP failed", extra={"error": e})
+            #     try:
+            #         await self._reserve_notifier.notify(updates)
+            #     except Exception as e:
+            #         logger.warning("Kafka failed", extra={"error": e})
+            #         return None
+
+
             try:
                 await self._base_notifier.notify(updates)
             except Exception as e:
-                logger.warning("HTTP failed", extra={"error": e})
-                try:
-                    await self._reserve_notifier.notify(updates)
-                except Exception as e:
-                    logger.warning("Kafka failed", extra={"error": e})
-                    return None
+                logger.warning("Kafka failed", extra={"error": e})
+                return None
+
 
             await self._service.mark_outbox_updates(updates)
             logger.info("Sent updates", extra={"count": len(updates)})

@@ -9,7 +9,7 @@ from api.tg_chat import chats
 from scheduler import Scheduler
 from outbox_processor import OutboxProcessor
 from dependencies.service_factory import get_service
-from dependencies.notifier_factory import get_http_notifier, get_kafka_notifier
+from dependencies.notifier_factory import get_kafka_notifier
 from dependencies.client_factory import get_clients_map
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -44,11 +44,11 @@ async def run_scrapper() -> None:
     service = get_service()
     clients_map = get_clients_map()
     kafka_notifier = get_kafka_notifier()
-    http_notifier = get_http_notifier()
+    #http_notifier = get_http_notifier()
 
     scheduler = Scheduler(service, clients_map)
     outbox_processor = OutboxProcessor(
-        service, base_notifier=http_notifier, reserve_notifier=kafka_notifier
+        service, base_notifier=kafka_notifier
     )
     await asyncio.gather(scheduler.start(), outbox_processor.start())
 

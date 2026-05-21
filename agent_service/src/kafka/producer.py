@@ -29,25 +29,6 @@ class KafkaNotifier:
 
         self._create_schema_registry()
 
-    async def notify(self, links_updates: list[LinkUpdate]) -> None:
-        """Отправка сообщений в Kafka."""
-        loop = asyncio.get_event_loop()
-
-        for update in links_updates:
-            message = self._avro_serializer(
-                update,
-                SerializationContext(self._topic, MessageField.VALUE),
-            )
-
-            await loop.run_in_executor(None, self._send_one, message)
-
-        await loop.run_in_executor(None, self._producer.flush)
-
-        logger.info(
-            "Send messages in Kafka",
-            extra={"count": len(links_updates), "topic": self._topic},
-        )
-
     def _create_schema_registry(self) -> None:
         schema_path = Path(__file__).parent.parent / "models" / "link.processed_update.avsc"
 
@@ -66,6 +47,6 @@ class KafkaNotifier:
             },
         )
 
-    def _send_one(self, message: bytes) -> None:
+    def notify(self, message: bytes) -> None:
         """Синхронная отправка одного сообщения."""
         self._producer.produce(self._topic, message)
