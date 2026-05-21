@@ -48,7 +48,9 @@ class NotifierFactory:
             settings.bot_url,
             cb=CircuitBreaker(
                 fail_max=settings.circuit_breaker.failure_threshold,
-                timeout_duration=timedelta(seconds=settings.circuit_breaker.recovery_timeout),
+                timeout_duration=timedelta(
+                    seconds=settings.circuit_breaker.recovery_timeout
+                ),
                 exclude=[httpx.HTTPError, httpx.RequestError],
             ),
         )

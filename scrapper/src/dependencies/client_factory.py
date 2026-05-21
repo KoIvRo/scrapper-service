@@ -26,7 +26,9 @@ class ClientFactory:
                 timeout=self._get_httpx_timeout(),
                 cb=CircuitBreaker(
                     fail_max=settings.circuit_breaker.failure_threshold,
-                    timeout_duration=timedelta(seconds=settings.circuit_breaker.recovery_timeout),
+                    timeout_duration=timedelta(
+                        seconds=settings.circuit_breaker.recovery_timeout
+                    ),
                     exclude=[httpx.HTTPError, httpx.RequestError],
                 ),
             )
@@ -42,7 +44,9 @@ class ClientFactory:
                 timeout=self._get_httpx_timeout(),
                 cb=CircuitBreaker(
                     fail_max=settings.circuit_breaker.failure_threshold,
-                    timeout_duration=timedelta(seconds=settings.circuit_breaker.recovery_timeout),
+                    timeout_duration=timedelta(
+                        seconds=settings.circuit_breaker.recovery_timeout
+                    ),
                     exclude=[httpx.HTTPError, httpx.RequestError],
                 ),
             )

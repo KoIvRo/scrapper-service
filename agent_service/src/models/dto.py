@@ -7,6 +7,7 @@ class LinkUpdate(BaseModel):
 
     updated_id: str = Field(default_factory=lambda: str(uuid4()))
     id: int
+    author: str
     url: HttpUrl
     description: str
     tgChatIds: list[int]

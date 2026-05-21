@@ -88,7 +88,9 @@ class KafkaConsumer:
         self._consumer.close()
 
     def _create_schema_registry(self) -> None:
-        schema_path = Path(__file__).parent.parent / "models" / "link.processed-updates.avsc"
+        schema_path = (
+            Path(__file__).parent.parent / "models" / "link.processed-updates.avsc"
+        )
 
         with open(schema_path, "r") as f:
             schema_str = f.read()

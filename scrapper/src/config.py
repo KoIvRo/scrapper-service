@@ -22,6 +22,7 @@ class RateLimitSettings(BaseModel):
     chats_post: str
     chats_delete: str
 
+
 class LoggerSettings(BaseModel):
     """Настройка логгера."""
 
@@ -35,6 +36,7 @@ class ConcurrencySettings(BaseModel):
     batch_size: int
     update_time: int
     concurrency_links: int
+
 
 class TimeoutSettings(BaseModel):
     """Настрйока Timeout."""
@@ -61,12 +63,14 @@ class CircuitBreakerSettings(BaseModel):
     failure_threshold: int
     recovery_timeout: int
 
+
 class OutboxSettings(BaseModel):
     """Настройка Outbox."""
 
     cleanup_interval: int
     days_to_truncate: int
     update_time: int
+
 
 class ValkeySettings(BaseModel):
     """Настройка Valkey."""
@@ -104,7 +108,6 @@ class Settings(BaseSettings):
     postgres_user: Optional[str]
     postgres_password: SecretStr
 
-
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
     )
@@ -115,7 +118,8 @@ def load_config() -> Settings:
 
     with open(Path(__file__).parent.parent / "config.yml", "r") as f:
         data = yaml.safe_load(f)
-    
+
     return Settings(**data)
+
 
 settings = load_config()

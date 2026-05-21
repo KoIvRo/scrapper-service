@@ -73,7 +73,7 @@ class KafkaConsumer:
                     await loop.run_in_executor(None, self._consumer.commit, message)
                     continue
 
-                await handle_update(update) # TODO
+                await handle_update(update)  # TODO
                 self._processed_id.add(update.updated_id)
                 await loop.run_in_executor(None, self._consumer.commit, message)
 

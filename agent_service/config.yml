@@ -1,2 +1,11 @@
-kafka:
+kafka_consumer:
   topic: link.raw-updates
+
+filters:
+  authors:
+   - KoIvRo
+   - BombordiroKrocodilo
+
+logger:
+  level: INFO
+  output: stdout

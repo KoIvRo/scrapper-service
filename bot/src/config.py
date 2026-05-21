@@ -30,6 +30,7 @@ class TimeoutSettings(BaseModel):
 
 class Settings(BaseSettings):
     """Базовый класс настроек pydantic."""
+
     service: ServiceSettings
     logger: LoggerSettings
     timeout: TimeoutSettings

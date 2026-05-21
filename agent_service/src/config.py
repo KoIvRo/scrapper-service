@@ -4,16 +4,31 @@ from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
 
-class KafkaSettings(BaseModel):
+class FiltersSettings(BaseModel):
+    """Класс настройка для фильтров."""
+
+    authors: list
+
+
+class KafkaConsumerSettings(BaseModel):
     """Класс настроек kafka."""
 
     topic: str
 
 
+class LoggerSettings(BaseModel):
+    """Класс настроек для логгера."""
+
+    level: str
+    output: str
+
+
 class Settings(BaseSettings):
     """Класс настроек приложения."""
 
-    kafka: KafkaSettings
+    logger: LoggerSettings
+    kafka_consumer: KafkaConsumerSettings
+    filters: FiltersSettings
 
 
 def load_config() -> Settings:
