@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "LinkUpdateEvent",
+  "namespace": "com.example.notification",
+  "fields": [
+    {"name": "updated_id", "type": "string"},
+    {"name": "id", "type": "long"},
+    {"name": "author", "type": "string"},
+    {"name": "url", "type": "string"},
+    {"name": "description", "type": "string"},
+    {"name": "tgChatIds", "type": {"type": "array", "items": "long"}}
+  ]
+}

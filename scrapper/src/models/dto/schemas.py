@@ -84,6 +84,7 @@ class LinkUpdate(BaseModel):
 
     updated_id: str = Field(default_factory=lambda: str(uuid4()))
     id: int
+    author: str
     url: str
     description: str = Field(default="Обнаружно изменение")
     tgChatIds: list[int]

@@ -1,8 +1,7 @@
 import asyncio
 from pathlib import Path
 from confluent_kafka import Producer
-from .base_notifier import BaseNotifier
-from models.dto.schemas import LinkUpdate
+from models.dto import LinkUpdate
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
 from confluent_kafka.serialization import SerializationContext, MessageField
@@ -11,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class KafkaNotifier(BaseNotifier):
+class KafkaNotifier:
     """Уведомление бота через Kafka."""
 
     def __init__(
@@ -50,7 +49,7 @@ class KafkaNotifier(BaseNotifier):
         )
 
     def _create_schema_registry(self) -> None:
-        schema_path = Path(__file__).parent.parent / "models" / "link.raw-updates.avsc"
+        schema_path = Path(__file__).parent.parent / "models" / "link.processed_update.avsc"
 
         with open(schema_path, "r") as f:
             schema_str = f.read()
@@ -61,7 +60,6 @@ class KafkaNotifier(BaseNotifier):
             lambda update, ctx: {
                 "updated_id": update.updated_id,
                 "id": update.id,
-                "author": update.author,
                 "url": str(update.url),
                 "description": update.description,
                 "tgChatIds": update.tgChatIds,

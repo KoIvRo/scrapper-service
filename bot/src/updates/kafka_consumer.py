@@ -88,7 +88,7 @@ class KafkaConsumer:
         self._consumer.close()
 
     def _create_schema_registry(self) -> None:
-        schema_path = Path(__file__).parent.parent / "models" / "link_update.avsc"
+        schema_path = Path(__file__).parent.parent / "models" / "link.processed-updates.avsc"
 
         with open(schema_path, "r") as f:
             schema_str = f.read()
@@ -99,6 +99,7 @@ class KafkaConsumer:
             lambda data, ctx: LinkUpdate(
                 updated_id=data["updated_id"],
                 id=data["id"],
+                author=data["author"],
                 url=data["url"],
                 description=data["description"],
                 tgChatIds=data["tgChatIds"],

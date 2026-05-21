@@ -106,7 +106,7 @@ class Scheduler:
         """Обработка одиночной сслыки."""
         chats = await self._service.get_chats_for_link(link.id)
         update = LinkUpdate(
-            id=link.id, url=str(link.url), description=str(event), tgChatIds=chats
+            id=link.id, author=event.author, url=str(link.url), description=str(event), tgChatIds=chats
         )
         await self._service.save_update_outbox(link.id, event.updated_at, update)
         return None
