@@ -32,3 +32,4 @@ Run linters and tests:
       poetry run ruff check --output-format=github --target-version=py311
       poetry run pytest bot/tests
       poetry run pytest scrapper/tests
+      poetry run pytest agent_service/tests

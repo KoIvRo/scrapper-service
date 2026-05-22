@@ -7,9 +7,11 @@ filters:
    - ad
    - spam
    - promo
+   - cheap
   min_length: 10
   threshold: 30
-ai_api:
+
+ai:
   use_ai: true
   url: https://router.huggingface.co/v1/chat/completions
   model: "deepseek-ai/DeepSeek-V4-Flash:fireworks-ai"

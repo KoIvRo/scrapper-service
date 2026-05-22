@@ -33,6 +33,8 @@ class Processor:
             tgChatIds=update.tgChatIds,
         )
 
+        return update
+
     def _process_filters(self, update: LinkUpdate) -> bool:
         """Прогнать обновление по фильтрам."""
 

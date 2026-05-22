@@ -2,6 +2,7 @@ from processor import Processor
 from filters.author_filter import AuthorFilter
 from filters.words_filter import WordsFilter
 from filters.length_filter import LengthFilter
+from .summarizer_factory import get_summarizer
 
 
 class ProcessorFactory:
@@ -14,7 +15,10 @@ class ProcessorFactory:
         """Получить processor."""
 
         if self._processor is None:
-            self._processor = Processor([AuthorFilter(), LengthFilter(), WordsFilter()])
+            self._processor = Processor(
+                [AuthorFilter(), LengthFilter(), WordsFilter()],
+                summarizer=get_summarizer(),
+            )
 
         return self._processor
 
