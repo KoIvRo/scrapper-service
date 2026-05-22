@@ -4,7 +4,7 @@ from config import settings
 from typing import Optional
 
 
-class SummarizerFacotry():
+class SummarizerFacotry:
     """Фабрика для summarizer."""
 
     def __init__(self) -> None:
@@ -20,13 +20,15 @@ class SummarizerFacotry():
                     connect=settings.timeout.connect,
                     read=settings.timeout.read,
                     write=settings.timeout.write,
-                    pool=settings.timeout.pool
-                )
+                    pool=settings.timeout.pool,
+                ),
             )
-        
+
         return self._summarizer
 
+
 summarizer_factory = SummarizerFacotry()
+
 
 def get_summarizer() -> Summarizer:
     """Получить Summarizer."""

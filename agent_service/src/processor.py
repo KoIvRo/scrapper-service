@@ -18,20 +18,20 @@ class Processor:
 
         if not await self._process_filters(update):
             return
-        
+
         logger.info("Update wasnt filtered", extra={"url": str(update.url)})
-        
+
         if self._summarizer.is_need(update.description):
             summary = self._summarizer.summarize(update.description)
             logger.info("Update was summarized", extra={"url": str(update.url)})
-        
+
         # Передать в kafka
-        processed_update = LinkUpdate( # noqa
+        processed_update = LinkUpdate(  # noqa
             id=update.id,
             author=update.author,
             url=str(update.url),
             description=summary,
-            tgChatIds=update.tgChatIds
+            tgChatIds=update.tgChatIds,
         )
 
     def _process_filters(self, update: LinkUpdate) -> bool:

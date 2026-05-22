@@ -9,4 +9,4 @@ class LengthFilter(BaseFilter):
     @staticmethod
     def filter(update: LinkUpdate) -> bool:
         """Фильтрация по длине."""
-        return update.description < settings.filters.min_length
+        return len(update.description) < settings.filters.min_length

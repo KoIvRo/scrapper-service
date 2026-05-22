@@ -13,9 +13,7 @@ class Summarizer:
     def _get_client(self) -> httpx.AsyncClient:
         """Получить клиента."""
         if self._client is None or self._client.is_closed:
-            self._client = httpx.AsyncClient(
-                timeout = self._timeout
-            )
+            self._client = httpx.AsyncClient(timeout=self._timeout)
 
     def summarize(self, description: str) -> str:
         """Сжатие текста (пока stub)."""
