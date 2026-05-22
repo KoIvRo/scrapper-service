@@ -10,6 +10,7 @@ class FiltersSettings(BaseModel):
     authors: list[str]
     min_length: int
     stop_words: list[str]
+    threshold: int
 
 
 class LoggerSettings(BaseModel):
@@ -19,11 +20,21 @@ class LoggerSettings(BaseModel):
     output: str
 
 
+class TimeoutSettings(BaseModel):
+    """Класс настроек для timeout."""
+
+    connect: int
+    read: int
+    write: int
+    pool: int
+
+
 class Settings(BaseSettings):
     """Класс настроек приложения."""
 
     logger: LoggerSettings
     filters: FiltersSettings
+    timeout: TimeoutSettings
 
     kafka_consumer_topic: str = "link.raw-updates"
     kafka_consumer_group: str = "agent-consumer-group"

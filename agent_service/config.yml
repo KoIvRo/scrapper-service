@@ -8,7 +8,14 @@ filters:
    - spam
    - promo
   min_length: 20
+  threshold: 100
 
 logger:
   level: INFO
   output: stdout
+
+timeout:
+  connect: 3
+  read: 3
+  write: 3
+  pool: 3
