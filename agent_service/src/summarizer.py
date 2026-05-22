@@ -87,12 +87,12 @@ class Summarizer:
         response = await client.post(self._url, headers=headers, json=payload)
         response.raise_for_status()
         return response
-    
+
     def _parse_response(self, response: httpx.Response) -> str:
         """Распрасить ответ от API."""
         data = response.json()
         return data["choices"][0]["message"]["content"]
-    
+
     def _shorten(self, description: str) -> str:
         """Укоротить сообщение."""
         return f"{description[:self._threshold_words]}..."

@@ -13,6 +13,7 @@ class TestNotifier:
         """Тест создания модели обновления."""
         update = LinkUpdate(
             id=sample_link.id,
+            author="test-user",
             url=str(sample_link.url),
             description="Обнаружено изменение",
             tgChatIds=[sample_link.chat_id],
@@ -38,6 +39,7 @@ class TestNotifier:
             update = LinkUpdate(
                 id=sample_link.id,
                 url=str(sample_link.url),
+                author="test-user",
                 description="Обнаружено изменение",
                 tgChatIds=[sample_link.chat_id],
             )
@@ -65,12 +67,14 @@ class TestNotifier:
                         id=sample_link.id,
                         url=str(sample_link.url),
                         description="Обнаружено изменение",
+                        author="test-user",
                         tgChatIds=[sample_link.chat_id],
                     ),
                     LinkUpdate(
                         id=another_link.id,
                         url=str(another_link.url),
                         description="Обнаружено изменение",
+                        author="test-user",
                         tgChatIds=[another_link.chat_id],
                     ),
                 ]
@@ -107,6 +111,7 @@ class TestNotifier:
         update = LinkUpdate(
             id=sample_link.id,
             url=str(sample_link.url),
+            author="test-user",
             description="Обнаружено изменение",
             tgChatIds=[sample_link.chat_id],
         )
@@ -128,6 +133,7 @@ class TestNotifier:
         update = LinkUpdate(
             id=sample_link.id,
             url=str(sample_link.url),
+            author="test-user",
             description="Обнаружено изменение",
             tgChatIds=[sample_link.chat_id],
         )
@@ -148,6 +154,7 @@ class TestNotifier:
 
         update = LinkUpdate(
             id=sample_link.id,
+            author="test-user",
             url=str(sample_link.url),
             description="Критическое уведомление",
             tgChatIds=[sample_link.chat_id],

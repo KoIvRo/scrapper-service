@@ -11,6 +11,7 @@ class TestBotAPIContract:
             "url": "not-a-url",
             "description": "Test",
             "tgChatIds": [123],
+            "author": "test-user",
         }
         response = client.post("/updates", json=data)
         assert response.status_code == 422
@@ -19,6 +20,7 @@ class TestBotAPIContract:
         data = {
             "url": "https://github.com/user/repo",
             "description": "Test",
+            "author": "test-user",
             "tgChatIds": [123],
         }
         response = client.post("/updates", json=data)
@@ -29,6 +31,7 @@ class TestBotAPIContract:
             "id": 1,
             "description": "Test",
             "tgChatIds": [123],
+            "author": "test-user",
         }
         response = client.post("/updates", json=data)
         assert response.status_code == 422

@@ -35,7 +35,7 @@ from clients.github_client import GitHubClient
 from dependencies.client_factory import ClientFactory
 from models.dto.schemas import LinkUpdate
 from notifier.kafka_notifier import KafkaNotifier
-from cache.cache_manager import CacheManager
+from cache_manager import CacheManager
 
 
 @pytest.fixture
@@ -114,6 +114,7 @@ def sample_updates():
             id=1,
             url="https://github.com/user/repo",
             description="Test update",
+            author="test-user",
             tgChatIds=[123],
         ),
         LinkUpdate(
@@ -121,6 +122,7 @@ def sample_updates():
             id=2,
             url="https://github.com/user/repo2",
             description="Test update 2",
+            author="test-user",
             tgChatIds=[456],
         ),
     ]
@@ -301,7 +303,6 @@ def valid_github_link():
 @pytest.fixture
 def mock_cache():
     """Мок CacheManager."""
-
     cache = MagicMock(spec=CacheManager)
     cache.get_cache_links = AsyncMock(return_value=None)
     cache.save_cache_links = AsyncMock()

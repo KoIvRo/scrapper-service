@@ -95,6 +95,7 @@ def valid_update_data():
     return {
         "id": 1,
         "url": "https://github.com/user/repo",
+        "author": "test-user",
         "description": "Test update",
         "tgChatIds": [123, 456],
     }

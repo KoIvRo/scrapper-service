@@ -15,6 +15,7 @@ class TestKafkaConsumer:
             url="https://github.com/user/repo",
             description="Test update",
             tgChatIds=[123],
+            author="test-user",
         )
 
         kafka_consumer._avro_deserializer = MagicMock(return_value=update)
@@ -44,6 +45,7 @@ class TestKafkaConsumer:
             url="https://github.com/user/repo2",
             description="Test update 2",
             tgChatIds=[456],
+            author="test-user",
         )
 
         kafka_consumer._processed_id.add("test-uuid-2")

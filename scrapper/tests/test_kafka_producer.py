@@ -34,6 +34,7 @@ class TestKafkaNotifier:
         update = LinkUpdate(
             updated_id="uuid-3",
             id=3,
+            author="test-user",
             url="https://github.com/user/repo3",
             description="Single update",
             tgChatIds=[789],

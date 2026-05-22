@@ -12,6 +12,7 @@ class TestBotAPI:
             "url": "not-a-url",
             "description": "Test",
             "tgChatIds": [123],
+            "author": "test-user",
         }
 
         response = client.post("/updates", json=invalid_data)
@@ -26,6 +27,7 @@ class TestBotAPI:
             "id": 1,
             "url": "https://github.com/user/repo",
             "tgChatIds": [123],
+            "author": "test-user",
         }
 
         response = client.post("/updates", json=invalid_data)
@@ -40,6 +42,7 @@ class TestBotAPI:
             "id": "not-an-int",
             "url": "https://github.com/user/repo",
             "description": "Test",
+            "author": "test-user",
             "tgChatIds": [123],
         }
 
@@ -55,6 +58,7 @@ class TestBotAPI:
             "id": 1,
             "url": "https://github.com/user/repo",
             "description": "Test",
+            "author": "test-user",
             "tgChatIds": "not-a-list",
         }
 
