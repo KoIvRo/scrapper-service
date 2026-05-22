@@ -69,7 +69,7 @@ services:
       POSTGRES_DB: project
       BOT_URL: http://fake-bot:8000
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      KAFKA_TOPIC: link-updates
+      KAFKA_TOPIC: link.raw-updates
       SCHEMA_REGISTRY_URL: http://schema-registry:8081
       NOTIFICATION_TYPE: kafka
       VALKEY_HOST: valkey
@@ -85,6 +85,21 @@ services:
       - kafka
       - schema-registry
       - valkey
+
+  agent_service:
+    build: ../agent_service
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_CONSUMER_TOPIC: link.raw-updates
+      KAFKA_CONSUMER_GROUP: agent-test-group
+      KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      AI_TOKEN: fake-token
+    networks:
+      - test-network
+    depends_on:
+      - kafka
+      - schema-registry
+      - scrapper
 
 networks:
   test-network:

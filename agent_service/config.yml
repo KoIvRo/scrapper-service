@@ -12,7 +12,7 @@ filters:
   threshold: 30
 
 ai:
-  use_ai: true
+  use_ai: false
   url: https://router.huggingface.co/v1/chat/completions
   model: "deepseek-ai/DeepSeek-V4-Flash:fireworks-ai"
 
