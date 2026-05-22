@@ -1,6 +1,6 @@
 import yaml
 from pathlib import Path
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,18 +29,29 @@ class TimeoutSettings(BaseModel):
     pool: int
 
 
+class AISettings(BaseModel):
+    """Класс настроек AI API."""
+
+    use_ai: bool
+    url: str
+    model: str
+
+
 class Settings(BaseSettings):
     """Класс настроек приложения."""
 
     logger: LoggerSettings
     filters: FiltersSettings
     timeout: TimeoutSettings
+    ai: AISettings
 
     kafka_consumer_topic: str = "link.raw-updates"
     kafka_consumer_group: str = "agent-consumer-group"
 
     kafka_schema_registry_url: str = "http://localhost:8081"
     kafka_bootstrap_servers: str = "localhost:9092,localhost:9093,localhost:9094"
+
+    ai_token: SecretStr
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent.parent / "secrets" / ".env",

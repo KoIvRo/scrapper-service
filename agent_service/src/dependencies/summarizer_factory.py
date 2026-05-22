@@ -22,6 +22,10 @@ class SummarizerFacotry:
                     write=settings.timeout.write,
                     pool=settings.timeout.pool,
                 ),
+                use_ai=settings.ai.use_ai,
+                api_url=settings.ai.url,
+                model=settings.ai.model,
+                token=settings.ai_token
             )
 
         return self._summarizer

@@ -9,13 +9,18 @@ filters:
    - promo
   min_length: 20
   threshold: 100
+ai_api:
+  use_ai: true
+  url: https://router.huggingface.co/v1/chat/completions
+  model: "deepseek-ai/DeepSeek-V4-Flash:fireworks-ai"
+
 
 logger:
   level: INFO
   output: stdout
 
 timeout:
-  connect: 3
-  read: 3
-  write: 3
-  pool: 3
+  connect: 10
+  read: 10
+  write: 10
+  pool: 10

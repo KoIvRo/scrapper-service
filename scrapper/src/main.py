@@ -44,7 +44,7 @@ async def run_scrapper() -> None:
     service = get_service()
     clients_map = get_clients_map()
     kafka_notifier = get_kafka_notifier()
-    # http_notifier = get_http_notifier()
+    #http_notifier = get_http_notifier()
 
     scheduler = Scheduler(service, clients_map)
     outbox_processor = OutboxProcessor(service, base_notifier=kafka_notifier)
