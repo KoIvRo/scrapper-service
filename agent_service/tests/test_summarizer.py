@@ -1,12 +1,10 @@
 import sys
 import pytest
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 import httpx
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
-
-from summarizer import Summarizer
 
 
 class TestSummarizer:

@@ -1,7 +1,6 @@
 from models.dto import LinkUpdate
 from filters.base_filter import BaseFilter
 from summarizer import Summarizer
-from typing import Optional
 import logging
 
 logger = logging.getLogger(__name__)

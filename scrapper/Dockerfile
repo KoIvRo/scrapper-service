@@ -21,4 +21,4 @@ COPY config.yml /app
 
 WORKDIR /app/src
 
-CMD ["sh", "-c", "sleep 5 && poetry run alembic upgrade head && poetry run python main.py"]
+CMD ["sh", "-c", "sleep 7 && poetry run alembic upgrade head && poetry run python main.py"]

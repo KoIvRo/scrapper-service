@@ -16,19 +16,19 @@ class TestAuthorFilter:
         """Если True, отбрасываем update."""
         with patch("filters.author_filter.settings") as mock_settings:
             mock_settings.filters.authors = ["KoIvRo"]
-            assert AuthorFilter.filter(mock_link_update) == True
+            assert AuthorFilter.filter(mock_link_update)
 
     def test_empty_author_filters(self, mock_link_update):
         """С пустым списком авторов."""
         with patch("filters.author_filter.settings") as mock_settings:
             mock_settings.filters.authors = []
-            assert AuthorFilter.filter(mock_link_update) == False
+            assert not AuthorFilter.filter(mock_link_update)
 
     def test_accepted_author_filters(self, mock_link_update):
         """Обновление прошло фильтр, False."""
         with patch("filters.author_filter.settings") as mock_settings:
             mock_settings.filters.authors = ["Unknown"]
-            assert AuthorFilter.filter(mock_link_update) == False
+            assert not AuthorFilter.filter(mock_link_update)
 
 
 class TestWordFilter:
@@ -38,19 +38,19 @@ class TestWordFilter:
         """Отнокление по стоп словам."""
         with patch("filters.words_filter.settings") as mock_settings:
             mock_settings.filters.stop_words = ["реклама"]
-            assert WordsFilter.filter(mock_link_update) == True
+            assert WordsFilter.filter(mock_link_update)
 
     def test_empty_filters(self, mock_link_update):
         """Пустой список."""
         with patch("filters.words_filter.settings") as mock_settings:
             mock_settings.filters.stop_words = []
-            assert WordsFilter.filter(mock_link_update) == False
+            assert not WordsFilter.filter(mock_link_update)
 
     def test_accepted_filters(self, mock_link_update):
         """Пустой список."""
         with patch("filters.words_filter.settings") as mock_settings:
             mock_settings.filters.stop_words = ["промо"]
-            assert WordsFilter.filter(mock_link_update) == False
+            assert not WordsFilter.filter(mock_link_update)
 
 
 class TestLengthFilter:
@@ -60,10 +60,10 @@ class TestLengthFilter:
         """Отколение в связи с малой длиной сообщения."""
         with patch("filters.length_filter.settings") as mock_settings:
             mock_settings.filters.min_length = 100
-            assert LengthFilter.filter(mock_link_update) == True
+            assert LengthFilter.filter(mock_link_update)
 
     def test_accepted_filters(self, mock_link_update):
         """Отколение в связи с малой длиной сообщения."""
         with patch("filters.length_filter.settings") as mock_settings:
             mock_settings.filters.min_length = 1
-            assert LengthFilter.filter(mock_link_update) == False
+            assert not LengthFilter.filter(mock_link_update)

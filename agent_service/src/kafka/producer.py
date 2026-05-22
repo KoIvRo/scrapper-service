@@ -1,10 +1,7 @@
-import asyncio
 from pathlib import Path
 from confluent_kafka import Producer
-from models.dto import LinkUpdate
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
-from confluent_kafka.serialization import SerializationContext, MessageField
 import logging
 
 logger = logging.getLogger(__name__)

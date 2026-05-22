@@ -73,7 +73,7 @@ class Settings(BaseSettings):
     ai_token: SecretStr
 
     model_config = SettingsConfigDict(
-        env_file=Path(__file__).parent.parent / "secrets" / ".env",
+        env_file=Path(__file__).parent / "secrets" / ".env",
         env_file_encoding="utf-8",
     )
 

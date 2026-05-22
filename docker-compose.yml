@@ -97,12 +97,19 @@ services:
     volumes:
       - valkey_data:/data
 
+  agent_service:
+    build: ./agent_service
+    networks:
+     - test-network
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry
+
+
   bot:
     build: ./bot
-    environment:
-      SCRAPPER_URL: http://scrapper:8001
-      KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
-      SCHEMA_REGISTRY_URL: http://schema-registry:8081
     ports:
       - "8000:8000"
     networks:
@@ -116,17 +123,6 @@ services:
 
   scrapper:
     build: ./scrapper
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
-      POSTGRES_PORT: 5432
-      POSTGRES_HOST: postgres
-      POSTGRES_DB: project
-      BOT_URL: http://bot:8000
-      KAFKA_BOOTSTRAP_SERVERS: kafka-1:29092,kafka-2:29093,kafka-3:29094
-      SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      VALKEY_HOST: valkey
-      VALKEY_PORT: 6379
     ports:
       - "8001:8001"
     networks:
