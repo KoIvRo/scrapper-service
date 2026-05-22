@@ -37,6 +37,23 @@ class AISettings(BaseModel):
     model: str
 
 
+class CircuitBreakerSettings(BaseModel):
+    """Класс настройки CircuitBreker."""
+
+    failure_threshold: int
+    recovery_timeout: int
+
+
+class RetrySettings(BaseModel):
+    """Настройка retry."""
+
+    max_attempts: int
+    exponential_multiplier: int
+    exponential_min_seconds: int
+    exponential_max_seconds: int
+    status_codes: list[int]
+
+
 class Settings(BaseSettings):
     """Класс настроек приложения."""
 
@@ -44,6 +61,8 @@ class Settings(BaseSettings):
     filters: FiltersSettings
     timeout: TimeoutSettings
     ai: AISettings
+    circuit_breaker: CircuitBreakerSettings
+    retry: RetrySettings
 
     kafka_consumer_topic: str = "link.raw-updates"
     kafka_consumer_group: str = "agent-consumer-group"

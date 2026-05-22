@@ -14,7 +14,7 @@ class ProcessorFactory:
         """Получить processor."""
 
         if self._processor is None:
-            self._processor = Processor([AuthorFilter, LengthFilter, WordsFilter])
+            self._processor = Processor([AuthorFilter(), LengthFilter(), WordsFilter()])
 
         return self._processor
 

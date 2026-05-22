@@ -40,7 +40,7 @@ async def main() -> None:
 
     await asyncio.gather(
         get_dispatcher().start_polling(get_bot()),
-        run_consumer(),  #run_api()
+        run_consumer(),  # run_api()
     )
 
 

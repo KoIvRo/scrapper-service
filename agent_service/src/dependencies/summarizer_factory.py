@@ -1,10 +1,12 @@
 import httpx
+from aiobreaker import CircuitBreaker
 from summarizer import Summarizer
+from datetime import timedelta
 from config import settings
 from typing import Optional
 
 
-class SummarizerFacotry:
+class SummarizerFactory:
     """Фабрика для summarizer."""
 
     def __init__(self) -> None:
@@ -23,15 +25,22 @@ class SummarizerFacotry:
                     pool=settings.timeout.pool,
                 ),
                 use_ai=settings.ai.use_ai,
-                api_url=settings.ai.url,
+                url=settings.ai.url,
                 model=settings.ai.model,
-                token=settings.ai_token
+                token=settings.ai_token,
+                cb=CircuitBreaker(
+                    fail_max=settings.circuit_breaker.failure_threshold,
+                    timeout_duration=timedelta(
+                        seconds=settings.circuit_breaker.recovery_timeout
+                    ),
+                    exclude=[httpx.HTTPError, httpx.RequestError],
+                ),
             )
 
         return self._summarizer
 
 
-summarizer_factory = SummarizerFacotry()
+summarizer_factory = SummarizerFactory()
 
 
 def get_summarizer() -> Summarizer:

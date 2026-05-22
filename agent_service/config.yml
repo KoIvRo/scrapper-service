@@ -7,13 +7,16 @@ filters:
    - ad
    - spam
    - promo
-  min_length: 20
-  threshold: 100
+  min_length: 10
+  threshold: 30
 ai_api:
   use_ai: true
   url: https://router.huggingface.co/v1/chat/completions
   model: "deepseek-ai/DeepSeek-V4-Flash:fireworks-ai"
 
+circuit_breaker:
+  failure_threshold: 2
+  recovery_timeout: 20
 
 logger:
   level: INFO
@@ -24,3 +27,10 @@ timeout:
   read: 10
   write: 10
   pool: 10
+
+retry:
+  max_attempts: 5
+  exponential_multiplier: 1.0
+  exponential_min_seconds: 1.0
+  exponential_max_seconds: 30.0
+  status_codes: [500,502,503,504]

@@ -17,7 +17,7 @@ class Processor:
     async def process_update(self, update: LinkUpdate) -> None:
         """Обработать обновление."""
 
-        if not await self._process_filters(update):
+        if not self._process_filters(update):
             return
 
         logger.info("Update wasnt filtered", extra={"url": str(update.url)})
