@@ -99,8 +99,8 @@ class Settings(BaseSettings):
     kafka_bootstrap_servers: Optional[str] = None
     kafka_schema_registry_url: Optional[str] = None
 
-    valkey_host: Optional[str]
-    valkey_port: Optional[str]
+    valkey_host: str = "localhost"
+    valkey_port: int = 6379
 
     postgres_host: Optional[str]
     postgres_port: Optional[int]
