@@ -1,7 +1,7 @@
 import yaml
 from pathlib import Path
 from pydantic import BaseModel
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class FiltersSettings(BaseModel):
@@ -10,12 +10,6 @@ class FiltersSettings(BaseModel):
     authors: list[str]
     min_length: int
     stop_words: list[str]
-
-
-class KafkaConsumerSettings(BaseModel):
-    """Класс настроек kafka."""
-
-    topic: str
 
 
 class LoggerSettings(BaseModel):
@@ -29,8 +23,18 @@ class Settings(BaseSettings):
     """Класс настроек приложения."""
 
     logger: LoggerSettings
-    kafka_consumer: KafkaConsumerSettings
     filters: FiltersSettings
+
+    kafka_consumer_topic: str = "link.raw-updates"
+    kafka_consumer_group: str = "agent-consumer-group"
+
+    kafka_schema_registry_url: str = "http://localhost:8081"
+    kafka_bootstrap_servers: str = "localhost:9092,localhost:9093,localhost:9094"
+
+    model_config = SettingsConfigDict(
+        env_file=Path(__file__).parent.parent / "secrets" / ".env",
+        env_file_encoding="utf-8",
+    )
 
 
 def load_config() -> Settings:

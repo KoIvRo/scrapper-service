@@ -13,7 +13,7 @@ class Processor:
 
     async def process_update(self, update: LinkUpdate) -> None:
         """Обработать обновление."""
-        
+
         if not await self._process_filters(update):
             return
 

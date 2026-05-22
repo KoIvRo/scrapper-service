@@ -14,13 +14,13 @@ class ProcessorFactory:
         """Получить processor."""
 
         if self._processor is None:
-            self._processor = Processor(
-                [AuthorFilter, LengthFilter, WordsFilter]
-            )
-        
+            self._processor = Processor([AuthorFilter, LengthFilter, WordsFilter])
+
         return self._processor
-    
+
+
 processor_factory = ProcessorFactory()
+
 
 def get_processor() -> Processor:
     """Получить Processor."""

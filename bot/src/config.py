@@ -2,7 +2,6 @@ import yaml
 from pathlib import Path
 from pydantic import BaseModel, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import Optional
 
 
 class ServiceSettings(BaseModel):
@@ -37,12 +36,12 @@ class Settings(BaseSettings):
 
     bot_token: SecretStr
 
-    scrapper_url: Optional[str] = None
+    scrapper_url: str = "http://scrapper:8001"
 
-    kafka_topic: Optional[str] = None
-    kafka_bootstrap_servers: Optional[str] = None
-    kafka_consumer_group: Optional[str] = None
-    kafka_schema_registry_url: Optional[str] = None
+    kafka_topic: str = "link.processed-updates"
+    kafka_bootstrap_servers: str = "localhost:9092,localhost:9093,localhost:9094"
+    kafka_consumer_group: str = "bot-consumer-group"
+    kafka_schema_registry_url: str = "http://localhost:8081"
 
     model_config = SettingsConfigDict(
         env_file=Path(__file__).parent / "secrets" / ".env", env_file_encoding="utf-8"
