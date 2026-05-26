@@ -1,7 +1,7 @@
 import asyncio
 from pathlib import Path
 from confluent_kafka import Consumer, KafkaError
-from models.schemas import LinkUpdate
+from models.schemas import ProcessedUpdate
 from .update_handler import handle_update
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
@@ -61,7 +61,7 @@ class KafkaConsumer:
                 continue
 
             try:
-                update: LinkUpdate = self._avro_deserializer(
+                update: ProcessedUpdate = self._avro_deserializer(
                     message.value(),
                     SerializationContext(self._topic, MessageField.VALUE),
                 )
@@ -78,7 +78,7 @@ class KafkaConsumer:
                 self._processed_id.add(update.updated_id)
                 await loop.run_in_executor(None, self._consumer.commit, message)
 
-                logger.info("Message was received", extra={"url": str(update.url)})
+                logger.info("Message was received", extra={"count_chats": len(update.tgChatIds)})
 
             except Exception as e:
                 logger.error("Failed to process message", extra={"error": e})
@@ -98,11 +98,9 @@ class KafkaConsumer:
         self._avro_deserializer = AvroDeserializer(
             self._schema_registry,
             schema_str,
-            lambda data, ctx: LinkUpdate(
+            lambda data, ctx: ProcessedUpdate(
                 updated_id=data["updated_id"],
-                id=data["id"],
-                author=data["author"],
-                url=data["url"],
+                priority=data["priority"],
                 description=data["description"],
                 tgChatIds=data["tgChatIds"],
             ),

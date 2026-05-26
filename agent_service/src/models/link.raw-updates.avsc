@@ -1,6 +1,6 @@
 {
   "type": "record",
-  "name": "LinkUpdateEvent",
+  "name": "LinkRawUpdateEvent",
   "namespace": "com.example.notification",
   "fields": [
     {"name": "updated_id", "type": "string"},

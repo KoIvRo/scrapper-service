@@ -2,6 +2,7 @@ from pathlib import Path
 from confluent_kafka import Producer
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroSerializer
+from models.dto import ProcessedUpdate
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,8 +16,8 @@ class KafkaNotifier:
     ) -> None:
         self._topic = topic
 
-        schema_registry_conf = {"url": schema_registry_url}
-        self._schema_registry = SchemaRegistryClient(schema_registry_conf)
+        self._schema_registry_conf = {"url": schema_registry_url}
+        self._schema_registry = SchemaRegistryClient(self._schema_registry_conf)
 
         self._producer = Producer(
             {
@@ -39,8 +40,7 @@ class KafkaNotifier:
             schema_str,
             lambda update, ctx: {
                 "updated_id": update.updated_id,
-                "id": update.id,
-                "url": str(update.url),
+                "priority": update.priority,
                 "description": update.description,
                 "tgChatIds": update.tgChatIds,
             },

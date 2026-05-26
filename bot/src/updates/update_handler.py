@@ -1,11 +1,11 @@
-from models.schemas import LinkUpdate
+from models.schemas import ProcessedUpdate
 from bot_instance import get_bot
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-async def handle_update(update: LinkUpdate) -> None:
+async def handle_update(update: ProcessedUpdate) -> None:
     """Отправка сообщения в бота."""
 
     bot = get_bot()

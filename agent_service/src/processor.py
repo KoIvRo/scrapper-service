@@ -23,8 +23,7 @@ class Processor:
 
         summary = await self._summarizer.summarize(update.description)
 
-        # Передать в kafka
-        update = LinkUpdate(  # noqa
+        update = LinkUpdate(
             id=update.id,
             author=update.author,
             url=str(update.url),
