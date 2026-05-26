@@ -10,6 +10,20 @@ filters:
    - cheap
   min_length: 10
   threshold: 30
+  high_words:
+   - critical
+   - fix
+   - security
+   - breaking
+   - bug
+  low_words:
+   - minor
+   - lint
+   - chore
+   - docs
+   - typo
+  window_ms: 30000
+
 
 ai:
   use_ai: false

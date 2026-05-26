@@ -11,6 +11,9 @@ class FiltersSettings(BaseModel):
     min_length: int
     stop_words: list[str]
     threshold: int
+    window_ms: int
+    high_words: list[str]
+    low_words: list[str]
 
 
 class LoggerSettings(BaseModel):
