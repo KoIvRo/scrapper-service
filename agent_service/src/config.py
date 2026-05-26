@@ -73,6 +73,8 @@ class Settings(BaseSettings):
     kafka_schema_registry_url: str = "http://localhost:8081"
     kafka_bootstrap_servers: str = "localhost:9092,localhost:9093,localhost:9094"
 
+    kafka_producer_topic: str = "link.processed-updates"
+
     ai_token: SecretStr
 
     model_config = SettingsConfigDict(

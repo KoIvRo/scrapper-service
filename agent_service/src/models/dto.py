@@ -5,6 +5,7 @@ from enum import Enum
 
 class Priority(str, Enum):
     """Приоритизация."""
+
     LOW = "LOW"
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"

@@ -24,7 +24,6 @@ filters:
    - typo
   window_ms: 30000
 
-
 ai:
   use_ai: false
   url: https://router.huggingface.co/v1/chat/completions

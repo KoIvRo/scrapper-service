@@ -78,7 +78,9 @@ class KafkaConsumer:
                 self._processed_id.add(update.updated_id)
                 await loop.run_in_executor(None, self._consumer.commit, message)
 
-                logger.info("Message was received", extra={"count_chats": len(update.tgChatIds)})
+                logger.info(
+                    "Message was received", extra={"count_chats": len(update.tgChatIds)}
+                )
 
             except Exception as e:
                 logger.error("Failed to process message", extra={"error": e})
