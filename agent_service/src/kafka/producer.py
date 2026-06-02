@@ -29,7 +29,7 @@ class KafkaNotifier:
 
         self._create_schema_registry()
 
-    async def notify(self, processed_update: list[ProcessedUpdate]) -> None:
+    async def notify(self, processed_update: ProcessedUpdate) -> None:
         """Отправка сообщений в Kafka."""
         loop = asyncio.get_event_loop()
 
@@ -48,7 +48,9 @@ class KafkaNotifier:
         )
 
     def _create_schema_registry(self) -> None:
-        schema_path = Path(__file__).parent.parent / "models" / "link.processed-updates.avsc"
+        schema_path = (
+            Path(__file__).parent.parent / "models" / "link.processed-updates.avsc"
+        )
 
         with open(schema_path, "r") as f:
             schema_str = f.read()

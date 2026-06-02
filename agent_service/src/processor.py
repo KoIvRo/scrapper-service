@@ -1,6 +1,8 @@
 from models.dto import LinkUpdate
 from filters.base_filter import BaseFilter
 from summarizer import Summarizer
+from models.dto import ProcessedUpdate
+from prioritizer import Prioritizer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -9,11 +11,17 @@ logger = logging.getLogger(__name__)
 class Processor:
     """Класс для обработки обновления."""
 
-    def __init__(self, filters: list[BaseFilter], summarizer: Summarizer) -> None:
+    def __init__(
+        self,
+        filters: list[BaseFilter],
+        summarizer: Summarizer,
+        prioritizer: Prioritizer,
+    ) -> None:
         self._filters = filters
         self._summarizer = summarizer
+        self._prioritizer = prioritizer
 
-    async def process_update(self, update: LinkUpdate) -> None:
+    async def process_update(self, update: LinkUpdate) -> ProcessedUpdate:
         """Обработать обновление."""
 
         if not self._process_filters(update):
@@ -23,15 +31,13 @@ class Processor:
 
         summary = await self._summarizer.summarize(update.description)
 
-        update = LinkUpdate(
-            id=update.id,
-            author=update.author,
-            url=str(update.url),
-            description=summary,
-            tgChatIds=update.tgChatIds,
+        priority = self._prioritizer.prioritize(update.description)
+
+        processed_update = ProcessedUpdate(
+            priority=priority, description=summary, tgChatIds=update.tgChatIds
         )
 
-        return update
+        return processed_update
 
     def _process_filters(self, update: LinkUpdate) -> bool:
         """Прогнать обновление по фильтрам."""

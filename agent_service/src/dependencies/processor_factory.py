@@ -3,6 +3,7 @@ from filters.author_filter import AuthorFilter
 from filters.words_filter import WordsFilter
 from filters.length_filter import LengthFilter
 from .summarizer_factory import get_summarizer
+from .prioritizer_factory import get_prioritizer
 
 
 class ProcessorFactory:
@@ -18,6 +19,7 @@ class ProcessorFactory:
             self._processor = Processor(
                 [AuthorFilter(), LengthFilter(), WordsFilter()],
                 summarizer=get_summarizer(),
+                prioritizer=get_prioritizer(),
             )
 
         return self._processor

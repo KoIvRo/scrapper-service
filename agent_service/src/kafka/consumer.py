@@ -100,6 +100,7 @@ class KafkaConsumer:
                 updated_id=data["updated_id"],
                 id=data["id"],
                 url=data["url"],
+                author=data["author"],
                 description=data["description"],
                 tgChatIds=data["tgChatIds"],
             ),
