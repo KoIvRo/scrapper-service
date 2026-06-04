@@ -26,11 +26,13 @@ class TestSummarizer:
 
     @pytest.mark.asyncio
     async def test_long_text_shortened_stub(self, summarizer_stub):
-        """Длинный текст обрезается."""
-        long_text = "A" * 150
+        """Длинный текст обрезается по словам."""
+        long_text = "word1 word2 word3 word4 word5 " * 30
         result = await summarizer_stub.summarize(long_text)
-        assert result == "A" * 100 + "..."
-        assert len(result) == 103
+
+        expected_words = (["word1", "word2", "word3", "word4", "word5"] * 30)[:100]
+        expected = " ".join(expected_words) + "..."
+        assert result == expected
 
     @pytest.mark.asyncio
     async def test_ai_success(self, summarizer_ai, mock_circuit_breaker):
@@ -42,7 +44,8 @@ class TestSummarizer:
         }
         mock_circuit_breaker.call_async.return_value = mock_response
 
-        result = await summarizer_ai.summarize("A" * 150)
+        long_text = "word " * 150
+        result = await summarizer_ai.summarize(long_text)
         assert result == "AI summary."
 
     @pytest.mark.asyncio
@@ -50,16 +53,22 @@ class TestSummarizer:
         """Ошибка AI → stub."""
         mock_circuit_breaker.call_async.side_effect = Exception("API error")
 
-        result = await summarizer_ai.summarize("A" * 150)
-        assert result == "A" * 100 + "..."
+        long_text = "hello " * 150
+        result = await summarizer_ai.summarize(long_text)
+
+        expected = " ".join(["hello"] * 100) + "..."
+        assert result == expected
 
     @pytest.mark.asyncio
     async def test_cb_open_uses_stub(self, summarizer_ai, mock_circuit_breaker):
         """CB OPEN → stub без запроса."""
         mock_circuit_breaker.state = "OPEN"
 
-        result = await summarizer_ai.summarize("A" * 150)
-        assert result == "A" * 100 + "..."
+        long_text = "test " * 150
+        result = await summarizer_ai.summarize(long_text)
+
+        expected = " ".join(["test"] * 100) + "..."
+        assert result == expected
         mock_circuit_breaker.call_async.assert_not_called()
 
     @pytest.mark.asyncio
@@ -69,5 +78,8 @@ class TestSummarizer:
         mock_response.status_code = 500
         mock_circuit_breaker.call_async.return_value = mock_response
 
-        result = await summarizer_ai.summarize("A" * 150)
-        assert result == "A" * 100 + "..."
+        long_text = "word " * 150
+        result = await summarizer_ai.summarize(long_text)
+
+        expected = " ".join(["word"] * 100) + "..."
+        assert result == expected
