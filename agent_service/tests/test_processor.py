@@ -15,7 +15,9 @@ class TestProcessorFiltering:
     """Тесты фильтрации (TC-2.1 – TC-2.4)."""
 
     @pytest.mark.asyncio
-    async def test_filter_by_stop_word(self, processor, mock_link_update_with_stop_word):
+    async def test_filter_by_stop_word(
+        self, processor, mock_link_update_with_stop_word
+    ):
         with patch("filters.words_filter.settings") as mock_settings:
             mock_settings.filters.stop_words = ["spam"]
             await processor.process_update(mock_link_update_with_stop_word)
@@ -56,12 +58,14 @@ class TestProcessorSummarization:
 
     @pytest.fixture
     def processor_with_stub(self):
-
         summarizer = Summarizer(
             threshold_words=100,
             timeout=httpx.Timeout(connect=1, read=1, write=1, pool=1),
-            cb=MagicMock(), use_ai=False,
-            url="http://fake", model="fake", token="fake",
+            cb=MagicMock(),
+            use_ai=False,
+            url="http://fake",
+            model="fake",
+            token="fake",
         )
         return Processor(
             filters=[],
@@ -71,7 +75,9 @@ class TestProcessorSummarization:
         )
 
     @pytest.mark.asyncio
-    async def test_short_text_not_summarized(self, processor_with_stub, mock_link_update):
+    async def test_short_text_not_summarized(
+        self, processor_with_stub, mock_link_update
+    ):
         await processor_with_stub.process_update(mock_link_update)
 
         call_args = processor_with_stub._grouper.add.call_args

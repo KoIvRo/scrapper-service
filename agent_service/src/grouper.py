@@ -45,7 +45,7 @@ class Grouper:
         """Сгруппировать и отправить."""
         if not updates:
             return
-        
+
         if len(updates) == 1:
             processed = updates[0]
         else:
@@ -65,5 +65,9 @@ class Grouper:
         logger.info(f"Flushed {len(updates)} updates for chat {chat_id}")
 
     def _max_priority(self, priorities: list[str]) -> str:
-        order = {Priority.HIGH.value: 3, Priority.MEDIUM.value: 2, Priority.LOW.value: 1}
+        order = {
+            Priority.HIGH.value: 3,
+            Priority.MEDIUM.value: 2,
+            Priority.LOW.value: 1,
+        }
         return max(priorities, key=lambda p: order[p])

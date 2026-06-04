@@ -51,6 +51,9 @@ class Processor:
 
         for filt in self._filters:
             if filt.filter(update):
-                logger.info("Update was discarded", extra={"url": str(update.url), "filter": {filt.__class__.__name__}})
+                logger.info(
+                    "Update was discarded",
+                    extra={"url": str(update.url), "filter": {filt.__class__.__name__}},
+                )
                 return False
         return True

@@ -20,7 +20,7 @@ class KafkaConsumer:
         topic: str,
         group_id: str,
         schema_registry_url: str,
-        processor: Processor
+        processor: Processor,
     ):
         schema_registry_conf = {"url": schema_registry_url}
         self._schema_registry = SchemaRegistryClient(schema_registry_conf)

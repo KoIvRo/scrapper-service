@@ -143,6 +143,7 @@ def test_prioritization(docker_services):
     assert r.status_code in (200, 201)
     time.sleep(10)
 
+
 @pytest.mark.timeout(30)
 def test_grouping_different_chats(docker_services):
     requests.post(f"{SCRAPPER_URL}/tg-chat/999", timeout=10)

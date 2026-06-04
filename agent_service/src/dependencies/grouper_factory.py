@@ -12,13 +12,17 @@ class GrouperFactory:
 
     def get_grouper(self) -> Grouper:
         """Получить группровщик."""
-        
+
         if self._grouper is None:
-            self._grouper = Grouper(window_ms=settings.filters.window_ms, notifier=get_producer())
-        
+            self._grouper = Grouper(
+                window_ms=settings.filters.window_ms, notifier=get_producer()
+            )
+
         return self._grouper
-    
+
+
 grouper_factory = GrouperFactory()
+
 
 def get_grouper() -> Grouper:
     """Получить группировщика."""

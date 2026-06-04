@@ -21,9 +21,10 @@ class ConsumerFactory:
                 schema_registry_url=settings.kafka_schema_registry_url,
                 processor=get_processor(),
             )
-        
+
         return self._consumer
-    
+
+
 consumer_factory = ConsumerFactory()
 
 
