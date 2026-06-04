@@ -3,6 +3,7 @@ import asyncio
 import uvicorn
 from pathlib import Path
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 from api.links import links
 from config import settings
 from api.tg_chat import chats
@@ -22,6 +23,8 @@ sys.path.append(str(Path(__file__).parent))
 limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)

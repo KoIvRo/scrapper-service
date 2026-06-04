@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException, Request
 from dependencies.service_factory import get_service
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from metrics import api_requests
 from config import settings
 
 
@@ -18,7 +19,8 @@ limiter = Limiter(get_remote_address)
 @limiter.limit(settings.rate_limit.chats_post)
 async def append_chat(request: Request, id: int) -> dict:
     """Добавление чата."""
-
+    api_requests.labels(source="bot").inc()
+    
     service = get_service()
     try:
         await service.append_chat(id)
@@ -45,6 +47,7 @@ async def append_chat(request: Request, id: int) -> dict:
 @limiter.limit(settings.rate_limit.links_delete)
 async def delete_chat(request: Request, id: int) -> dict:
     """Удаление чата."""
+    api_requests.labels(source="bot").inc()
 
     service = get_service()
     try:

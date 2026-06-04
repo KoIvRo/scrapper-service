@@ -13,6 +13,7 @@ from models.dto.schemas import (
 )
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from metrics import api_requests
 from config import settings
 
 links = APIRouter(prefix="/links")
@@ -32,6 +33,7 @@ async def get_links(
     tg_chat_id: int = Header(..., alias="Tg-Chat-Id"),
 ):
     """Получить все ссылки."""
+    api_requests.labels(source="bot").inc()
 
     service = get_service()
 
@@ -78,6 +80,7 @@ async def append_link(
     tg_chat_id: int = Header(..., alias="Tg-Chat-Id"),
 ):
     """Добавление ссылки."""
+    api_requests.labels(source="bot").inc()
 
     service = get_service()
 
@@ -112,6 +115,7 @@ async def delete_link(
     tg_chat_id: int = Header(..., alias="Tg-Chat-Id"),
 ):
     """Удаление ссылки."""
+    api_requests.labels(source="bot").inc()
 
     service = get_service()
 

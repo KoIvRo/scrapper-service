@@ -5,6 +5,8 @@ from abc import ABC, abstractmethod
 from validators.validators import BaseUrlValidator
 from models.dto.schemas import BaseEvent
 from retry_decorator import retry_decorator
+from metrics import request_duration
+import time
 
 
 class BaseClient(ABC):
@@ -39,7 +41,14 @@ class BaseClient(ABC):
     ) -> httpx.Response:
         """Сделать get."""
         client = await self._get_client()
+
+        start = time.monotonic()
+
         response = await client.get(url, params=params, headers=headers)
+
+        duration_ms = (time.monotonic() - start) * 1000
+        request_duration.labels(scope="external_source", scope_type=self.__class__.__name__).observe(duration_ms)
+
         response.raise_for_status()
         return response
 
