@@ -11,6 +11,9 @@ async def handle_update(update: ProcessedUpdate) -> None:
     bot = get_bot()
 
     for chat_id in update.tgChatIds:
-        await bot.send_message(chat_id=chat_id, text=f"Приоритет: {update.priority}\n{update.description}")
+        await bot.send_message(
+            chat_id=chat_id,
+            text=f"Приоритет: {update.priority.value}\n{update.description}"
+        )
 
     logger.info("Update sent", extra={"count_chats": len(update.tgChatIds)})

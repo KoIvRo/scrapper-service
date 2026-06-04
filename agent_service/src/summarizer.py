@@ -41,7 +41,7 @@ class Summarizer:
     async def summarize(self, description: str) -> str:
         """Сжатие текста."""
 
-        if not self._is_need(len(description)):
+        if not self._is_need(len(description.split())):
             return description
 
         elif not self._use_ai or self._cb.state == "OPEN":
@@ -95,7 +95,7 @@ class Summarizer:
 
     def _shorten(self, description: str) -> str:
         """Укоротить сообщение."""
-        return f"{description[:self._threshold_words]}..."
+        return f"{" ".join(description.split()[:self._threshold_words])}..."
 
     def _is_need(self, len_description: int) -> bool:
         """Нужна ли саммаризация."""

@@ -1,14 +1,13 @@
 filters:
   authors:
    - KoIvRo
-   - BombordiroKrocodilo
   stop_words:
    - реклама
    - ad
    - spam
    - promo
    - cheap
-  min_length: 10
+  min_length: 0
   threshold: 30
   high_words:
    - critical
@@ -22,7 +21,7 @@ filters:
    - chore
    - docs
    - typo
-  window_ms: 5000
+  window_ms: 15000
 
 ai:
   use_ai: false
