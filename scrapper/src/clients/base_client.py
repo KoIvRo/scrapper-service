@@ -47,7 +47,9 @@ class BaseClient(ABC):
         response = await client.get(url, params=params, headers=headers)
 
         duration_ms = (time.monotonic() - start) * 1000
-        request_duration.labels(scope="external_source", scope_type=self.__class__.__name__).observe(duration_ms)
+        request_duration.labels(
+            scope="external_source", scope_type=self.__class__.__name__
+        ).observe(duration_ms)
 
         response.raise_for_status()
         return response

@@ -20,7 +20,7 @@ limiter = Limiter(get_remote_address)
 async def append_chat(request: Request, id: int) -> dict:
     """Добавление чата."""
     api_requests.labels(source="bot").inc()
-    
+
     service = get_service()
     try:
         await service.append_chat(id)

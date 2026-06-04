@@ -25,9 +25,9 @@ async def handle_start(message: Message) -> None:
                 "username": message.from_user.username,
             },
         )
-        command_duration.labels(
-            scope="bot_command", scope_type="start"
-        ).observe((time.monotonic() - start) * 1000)
+        command_duration.labels(scope="bot_command", scope_type="start").observe(
+            (time.monotonic() - start) * 1000
+        )
     except Exception as e:
         logger.error(
             "Error processing /start",
@@ -56,9 +56,9 @@ async def handle_help(message: Message) -> None:
             },
         )
 
-        command_duration.labels(
-            scope="bot_command", scope_type="help"
-        ).observe((time.monotonic() - start) * 1000)
+        command_duration.labels(scope="bot_command", scope_type="help").observe(
+            (time.monotonic() - start) * 1000
+        )
     except Exception as e:
         logger.error(
             "Error processing /help",
@@ -88,9 +88,9 @@ async def handle_unknown_message(message: Message) -> None:
                 "command": message.text,
             },
         )
-        command_duration.labels(
-            scope="bot_command", scope_type="unknown"
-        ).observe((time.monotonic() - start) * 1000)
+        command_duration.labels(scope="bot_command", scope_type="unknown").observe(
+            (time.monotonic() - start) * 1000
+        )
     except Exception as e:
         logger.error(
             "An unknown command was processed.",

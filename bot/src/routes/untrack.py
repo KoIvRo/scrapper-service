@@ -60,9 +60,9 @@ async def waiting_for_links(message: Message, state=FSMContext) -> None:
         else:
             await message.answer(UntrackMessages.ERROR)
             await state.clear()
-        command_duration.labels(
-            scope="bot_command", scope_type="untrack"
-        ).observe((time.monotonic() - start) * 1000)
+        command_duration.labels(scope="bot_command", scope_type="untrack").observe(
+            (time.monotonic() - start) * 1000
+        )
     except Exception:
         await message.answer(UntrackMessages.ERROR)
         await state.clear()

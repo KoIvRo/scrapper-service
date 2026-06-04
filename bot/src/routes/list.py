@@ -71,9 +71,9 @@ async def track_list(message: Message, state: FSMContext) -> None:
         reply_markup=kb,
     )
 
-    command_duration.labels(
-        scope="bot_command", scope_type="list"
-    ).observe((time.monotonic() - start) * 1000)
+    command_duration.labels(scope="bot_command", scope_type="list").observe(
+        (time.monotonic() - start) * 1000
+    )
 
 
 @list_command.callback_query(ListStates.waiting_for_command)

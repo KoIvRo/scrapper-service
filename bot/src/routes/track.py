@@ -112,9 +112,9 @@ async def waiting_for_tags(message: Message, state=FSMContext) -> None:
         else:
             await message.answer(TrackMessages.INVALID_URL)
             await state.clear()
-        command_duration.labels(
-            scope="bot_command", scope_type="track"
-        ).observe((time.monotonic() - start) * 1000)
+        command_duration.labels(scope="bot_command", scope_type="track").observe(
+            (time.monotonic() - start) * 1000
+        )
     except Exception:
         await message.answer(TrackMessages.ERROR)
         await state.clear()
