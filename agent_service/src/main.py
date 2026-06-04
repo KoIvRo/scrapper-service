@@ -1,5 +1,4 @@
 import asyncio
-from config import settings
 from dependencies.kafka_factory import get_consumer
 from logger_config import init_logger
 

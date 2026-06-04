@@ -40,7 +40,7 @@ class Processor:
             priority=priority, description=summary, tgChatIds=update.tgChatIds
         )
 
-        return processed_update
+        await self._grouper.add(processed_update)
 
     def _process_filters(self, update: LinkUpdate) -> bool:
         """Прогнать обновление по фильтрам."""
