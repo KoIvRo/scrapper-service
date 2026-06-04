@@ -39,7 +39,7 @@ class Summarizer:
         return self._client
 
     async def summarize(self, description: str) -> str:
-        """Сжатие текста (пока stub)."""
+        """Сжатие текста."""
 
         if not self._is_need(len(description)):
             return description

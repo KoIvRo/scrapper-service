@@ -3,6 +3,7 @@ from filters.base_filter import BaseFilter
 from summarizer import Summarizer
 from models.dto import ProcessedUpdate
 from prioritizer import Prioritizer
+from grouper import Grouper
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,10 +17,12 @@ class Processor:
         filters: list[BaseFilter],
         summarizer: Summarizer,
         prioritizer: Prioritizer,
+        grouper: Grouper,
     ) -> None:
         self._filters = filters
         self._summarizer = summarizer
         self._prioritizer = prioritizer
+        self._grouper = grouper
 
     async def process_update(self, update: LinkUpdate) -> ProcessedUpdate:
         """Обработать обновление."""

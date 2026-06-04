@@ -1,18 +1,13 @@
 import asyncio
 from config import settings
-from kafka.consumer import KafkaConsumer
+from dependencies.kafka_factory import get_consumer
 from logger_config import init_logger
 
 
 async def run_consumer() -> None:
     """Запуск консьюмера."""
 
-    consumer = KafkaConsumer(
-        bootstrap_servers=settings.kafka_bootstrap_servers,
-        topic=settings.kafka_consumer_topic,
-        group_id=settings.kafka_consumer_group,
-        schema_registry_url=settings.kafka_schema_registry_url,
-    )
+    consumer = get_consumer()
     await consumer.start()
 
 
