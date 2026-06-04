@@ -14,6 +14,7 @@ from exceptions import (
     InvalidPage,
 )
 from datetime import datetime
+from metrics import links_on_track
 import logging
 
 
@@ -103,7 +104,12 @@ class LinkService(BaseService):
 
             await self._cache_manager.delete_cache_links(chat_id)
 
-            return await self._repo.append_link(chat_id, url, tags)
+            link = await self._repo.append_link(chat_id, url, tags)
+
+            source = "github" if "github.com" in url else "stackoverflow"
+            links_on_track.labels(tracked_source=source).inc()
+
+            return link
 
     async def delete_link(self, chat_id: int, url: str) -> Link:
         """Удаление ссылки"""
@@ -114,7 +120,12 @@ class LinkService(BaseService):
 
             await self._cache_manager.delete_cache_links(chat_id)
 
-            return await self._repo.delete_link(chat_id, url)
+            link = await self._repo.delete_link(chat_id, url)
+
+            source = "github" if "github.com" in url else "stackoverflow"
+            links_on_track.labels(tracked_source=source).dec()
+
+            return link
 
     async def get_chats_for_link(self, link_id: int) -> bool:
         """Получение чатов, отслеживающих ссылку."""
