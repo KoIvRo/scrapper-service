@@ -1,3 +1,4 @@
+import time
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from typing import Optional
@@ -9,6 +10,7 @@ from constants.messages import TrackMessages
 from dependencies.client_factory import get_client
 from models.schemas import ListLinksResponse, LinkResponse
 from constants.messages import ListMessages
+from metrics import command_duration, command_requests
 import logging
 
 logger = logging.getLogger(__name__)
@@ -34,6 +36,9 @@ def build_pagination_kb(
 @list_command.message(Command("list"))
 async def track_list(message: Message, state: FSMContext) -> None:
     """Обработка команды /list."""
+    command_requests.labels(command="help").inc()
+    start = time.monotonic()
+
     logger.info(
         "The /list command was received",
         extra={
@@ -65,6 +70,10 @@ async def track_list(message: Message, state: FSMContext) -> None:
         TrackMessages.get_links(links) if links else TrackMessages.LINKS_ARE_MISSING,
         reply_markup=kb,
     )
+
+    command_duration.labels(
+        scope="bot_command", scope_type="list"
+    ).observe((time.monotonic() - start) * 1000)
 
 
 @list_command.callback_query(ListStates.waiting_for_command)

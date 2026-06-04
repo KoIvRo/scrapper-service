@@ -1,3 +1,4 @@
+import time
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
@@ -6,6 +7,7 @@ from .states import TrackStates
 from constants.messages import TrackMessages
 from dependencies.client_factory import get_client
 from pydantic import HttpUrl, ValidationError
+from metrics import command_duration, command_requests
 import logging
 
 
@@ -98,7 +100,10 @@ async def waiting_for_tags(message: Message, state=FSMContext) -> None:
 
     client = get_client()
 
+    command_requests.labels(command="track").inc()
+
     try:
+        start = time.monotonic()
         result = await client.append_link(chat_id=message.chat.id, url=url, tags=tags)
 
         if result:
@@ -107,6 +112,9 @@ async def waiting_for_tags(message: Message, state=FSMContext) -> None:
         else:
             await message.answer(TrackMessages.INVALID_URL)
             await state.clear()
+        command_duration.labels(
+            scope="bot_command", scope_type="track"
+        ).observe((time.monotonic() - start) * 1000)
     except Exception:
         await message.answer(TrackMessages.ERROR)
         await state.clear()

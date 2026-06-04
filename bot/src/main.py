@@ -8,6 +8,7 @@ from updates.api import update
 from logger_config import init_logger
 from bot_instance import bot_factory, get_bot, get_dispatcher
 from updates.kafka_consumer import KafkaConsumer
+from prometheus_fastapi_instrumentator import Instrumentator
 
 sys.path.append(str(Path(__file__).parent))
 
@@ -18,6 +19,7 @@ async def run_api() -> None:
     app.include_router(update)
     config = uvicorn.Config(app, host=settings.service.host, port=settings.service.port)
     server = uvicorn.Server(config)
+    Instrumentator().instrument(app).expose(app)
     await server.serve()
 
 
@@ -40,7 +42,7 @@ async def main() -> None:
 
     await asyncio.gather(
         get_dispatcher().start_polling(get_bot()),
-        run_consumer(),  # run_api()
+        run_consumer(), run_api()
     )
 
 

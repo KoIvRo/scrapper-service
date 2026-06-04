@@ -1,5 +1,6 @@
 from models.schemas import ProcessedUpdate
 from bot_instance import get_bot
+from metrics import sent_notifications
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,4 +17,5 @@ async def handle_update(update: ProcessedUpdate) -> None:
             text=f"Приоритет: {update.priority.value}\n{update.description}",
         )
 
+    sent_notifications.inc()
     logger.info("Update sent", extra={"count_chats": len(update.tgChatIds)})

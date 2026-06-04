@@ -1,3 +1,4 @@
+import time
 from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import Command
@@ -5,6 +6,7 @@ from aiogram.types import Message
 from .states import UntrackStates
 from constants.messages import UntrackMessages
 from dependencies.client_factory import get_client
+from metrics import command_duration, command_requests
 import logging
 
 untrack = Router()
@@ -44,9 +46,12 @@ async def waiting_for_links(message: Message, state=FSMContext) -> None:
         await message.answer(UntrackMessages.CANCEL_UNTRACK)
         return
 
+    command_requests.labels(command="untrack").inc()
+
     url = message.text
     client = get_client()
     try:
+        start = time.monotonic()
         response = await client.delete_link(message.chat.id, url)
 
         if response:
@@ -55,6 +60,9 @@ async def waiting_for_links(message: Message, state=FSMContext) -> None:
         else:
             await message.answer(UntrackMessages.ERROR)
             await state.clear()
+        command_duration.labels(
+            scope="bot_command", scope_type="untrack"
+        ).observe((time.monotonic() - start) * 1000)
     except Exception:
         await message.answer(UntrackMessages.ERROR)
         await state.clear()
