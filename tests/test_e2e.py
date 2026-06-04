@@ -33,7 +33,7 @@ def docker_services():
 
 @pytest.mark.timeout(30)
 @pytest.mark.asyncio
-async def test_register_chat(docker_services):  # noqa
+async def test_register_chat(docker_services):
     async with httpx.AsyncClient() as c:
         r = await c.post(f"{SCRAPPER_URL}/tg-chat/123", timeout=10)
         assert r.status_code == 200
@@ -41,7 +41,7 @@ async def test_register_chat(docker_services):  # noqa
 
 @pytest.mark.timeout(30)
 @pytest.mark.asyncio
-async def test_add_link(docker_services):  # noqa
+async def test_add_link(docker_services):
     async with httpx.AsyncClient() as c:
         await c.post(f"{SCRAPPER_URL}/tg-chat/456", timeout=10)
         r = await c.post(
@@ -54,12 +54,7 @@ async def test_add_link(docker_services):  # noqa
 
 
 @pytest.mark.timeout(30)
-def test_valid_message_consumed(docker_services):  # noqa
-    """
-    TC-1.1: Scrapper публикует ссылку → пишет в Kafka →
-    agent_service получает без ошибок десериализации.
-    """
-
+def test_valid_message_consumed(docker_services):
     requests.post(f"{SCRAPPER_URL}/tg-chat/111", timeout=10)
     r = requests.post(
         f"{SCRAPPER_URL}/links",
@@ -72,12 +67,7 @@ def test_valid_message_consumed(docker_services):  # noqa
 
 
 @pytest.mark.timeout(30)
-def test_invalid_message_not_crash(docker_services):  # noqa
-    """
-    TC-1.2: Scrapper отправляет ссылку с длинным описанием,
-    agent_service обрабатывает. Сервис не падает.
-    """
-
+def test_invalid_message_not_crash(docker_services):
     requests.post(f"{SCRAPPER_URL}/tg-chat/222", timeout=10)
     r = requests.post(
         f"{SCRAPPER_URL}/links",
@@ -86,15 +76,11 @@ def test_invalid_message_not_crash(docker_services):  # noqa
         timeout=10,
     )
     assert r.status_code in (200, 201)
-
     time.sleep(10)
 
 
 @pytest.mark.timeout(30)
-def test_stop_word_filtered(docker_services):  # noqa
-    """
-    TC-2.1: Сообщение со стоп-словом отфильтровывается.
-    """
+def test_stop_word_filtered(docker_services):
     requests.post(f"{SCRAPPER_URL}/tg-chat/333", timeout=10)
     r = requests.post(
         f"{SCRAPPER_URL}/links",
@@ -103,16 +89,11 @@ def test_stop_word_filtered(docker_services):  # noqa
         timeout=10,
     )
     assert r.status_code in (200, 201)
-
     time.sleep(10)
 
 
 @pytest.mark.timeout(30)
-def test_excluded_author_filtered(docker_services):  # noqa
-    """
-    TC-2.2: Сообщение от исключённого автора отфильтровывается.
-    """
-
+def test_excluded_author_filtered(docker_services):
     requests.post(f"{SCRAPPER_URL}/tg-chat/444", timeout=10)
     r = requests.post(
         f"{SCRAPPER_URL}/links",
@@ -121,16 +102,11 @@ def test_excluded_author_filtered(docker_services):  # noqa
         timeout=10,
     )
     assert r.status_code in (200, 201)
-
     time.sleep(10)
 
 
 @pytest.mark.timeout(30)
-def test_short_message_filtered(docker_services):  # noqa
-    """
-    TC-2.3: Короткое сообщение отфильтровывается.
-    """
-
+def test_short_message_filtered(docker_services):
     requests.post(f"{SCRAPPER_URL}/tg-chat/555", timeout=10)
     r = requests.post(
         f"{SCRAPPER_URL}/links",
@@ -139,15 +115,11 @@ def test_short_message_filtered(docker_services):  # noqa
         timeout=10,
     )
     assert r.status_code in (200, 201)
-
     time.sleep(10)
 
 
 @pytest.mark.timeout(30)
-def test_valid_message_passes_filters(docker_services):  # noqa
-    """
-    TC-2.4: Валидное сообщение проходит все фильтры.
-    """
+def test_valid_message_passes_filters(docker_services):
     requests.post(f"{SCRAPPER_URL}/tg-chat/666", timeout=10)
     r = requests.post(
         f"{SCRAPPER_URL}/links",
@@ -156,5 +128,37 @@ def test_valid_message_passes_filters(docker_services):  # noqa
         timeout=10,
     )
     assert r.status_code in (200, 201)
+    time.sleep(10)
 
+
+@pytest.mark.timeout(30)
+def test_prioritization(docker_services):
+    requests.post(f"{SCRAPPER_URL}/tg-chat/777", timeout=10)
+    r = requests.post(
+        f"{SCRAPPER_URL}/links",
+        json={"link": "https://github.com/e2e/urgent-repo", "tags": ["critical"]},
+        headers={"Tg-Chat-Id": "777"},
+        timeout=10,
+    )
+    assert r.status_code in (200, 201)
+    time.sleep(10)
+
+@pytest.mark.timeout(30)
+def test_grouping_different_chats(docker_services):
+    requests.post(f"{SCRAPPER_URL}/tg-chat/999", timeout=10)
+    requests.post(f"{SCRAPPER_URL}/tg-chat/1000", timeout=10)
+    r1 = requests.post(
+        f"{SCRAPPER_URL}/links",
+        json={"link": "https://github.com/e2e/chat1-repo", "tags": ["e2e"]},
+        headers={"Tg-Chat-Id": "999"},
+        timeout=10,
+    )
+    assert r1.status_code in (200, 201)
+    r2 = requests.post(
+        f"{SCRAPPER_URL}/links",
+        json={"link": "https://github.com/e2e/chat2-repo", "tags": ["e2e"]},
+        headers={"Tg-Chat-Id": "1000"},
+        timeout=10,
+    )
+    assert r2.status_code in (200, 201)
     time.sleep(10)
