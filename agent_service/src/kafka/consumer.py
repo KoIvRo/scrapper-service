@@ -5,7 +5,7 @@ from models.dto import LinkUpdate
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.avro import AvroDeserializer
 from confluent_kafka.serialization import SerializationContext, MessageField
-from .handle_update import handle_update
+from processor import Processor
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,10 +20,12 @@ class KafkaConsumer:
         topic: str,
         group_id: str,
         schema_registry_url: str,
+        processor: Processor
     ):
         schema_registry_conf = {"url": schema_registry_url}
         self._schema_registry = SchemaRegistryClient(schema_registry_conf)
         self._create_schema_registry()
+        self._processor = processor
 
         self._consumer = Consumer(
             {
@@ -74,7 +76,7 @@ class KafkaConsumer:
                     await loop.run_in_executor(None, self._consumer.commit, message)
                     continue
 
-                await handle_update(update)
+                await self._processor.process_update(update)
                 self._processed_id.add(update.updated_id)
                 await loop.run_in_executor(None, self._consumer.commit, message)
 

@@ -22,7 +22,7 @@ filters:
    - chore
    - docs
    - typo
-  window_ms: 30000
+  window_ms: 5000
 
 ai:
   use_ai: false

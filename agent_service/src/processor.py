@@ -34,7 +34,11 @@ class Processor:
 
         summary = await self._summarizer.summarize(update.description)
 
+        logger.info("Text was summarized", extra={"url": str(update.url)})
+
         priority = self._prioritizer.prioritize(update.description)
+
+        logger.info("Update was prioritized", extra={"url": str(update.url)})
 
         processed_update = ProcessedUpdate(
             priority=priority, description=summary, tgChatIds=update.tgChatIds
@@ -47,6 +51,6 @@ class Processor:
 
         for filt in self._filters:
             if filt.filter(update):
-                logger.info("Update was discarded", extra={"name": str(update.url)})
+                logger.info("Update was discarded", extra={"url": str(update.url), "filter": {filt.__class__.__name__}})
                 return False
         return True

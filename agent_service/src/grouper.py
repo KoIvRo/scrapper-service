@@ -12,10 +12,10 @@ class Grouper:
 
     def __init__(self, window_ms: int, notifier: KafkaNotifier):
         self._window_sec = window_ms / 1000
-        self._notifier = notifier
         self._buckets: dict[int, list[ProcessedUpdate]] = defaultdict(list)
         self._timers: dict[int, asyncio.Task] = {}
         self._lock = asyncio.Lock()
+        self._notifier = notifier
 
     async def add(self, update: ProcessedUpdate):
         """Добавить обновление в группу."""
@@ -43,6 +43,9 @@ class Grouper:
 
     async def _flush(self, chat_id: int, updates: list[ProcessedUpdate]):
         """Сгруппировать и отправить."""
+        if not updates:
+            return
+        
         if len(updates) == 1:
             processed = updates[0]
         else:

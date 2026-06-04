@@ -1,6 +1,6 @@
 from config import settings
 from grouper import Grouper
-from .kafka_factory import get_producer
+from .producer_factory import get_producer
 from typing import Optional
 
 
@@ -14,7 +14,7 @@ class GrouperFactory:
         """Получить группровщик."""
         
         if self._grouper is None:
-            self._grouper = Grouper(window_ms=settings.filters.window_ms,notifier=get_producer())
+            self._grouper = Grouper(window_ms=settings.filters.window_ms, notifier=get_producer())
         
         return self._grouper
     

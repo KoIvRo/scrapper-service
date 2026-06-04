@@ -37,6 +37,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-1:29092,EXTERNAL://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LOG4J_ROOT_LOGLEVEL: 'WARN'
+      KAFKA_LOG4J_LOGGERS: 'org.apache.zookeeper=WARN,org.apache.kafka=WARN,kafka=WARN,state.change.logger=WARN'
     networks:
       - test-network
 
@@ -53,6 +55,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:29093,EXTERNAL://localhost:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LOG4J_ROOT_LOGLEVEL: 'WARN'
+      KAFKA_LOG4J_LOGGERS: 'org.apache.zookeeper=WARN,org.apache.kafka=WARN,kafka=WARN,state.change.logger=WARN'
     networks:
       - test-network
 
@@ -69,6 +73,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:29094,EXTERNAL://localhost:9094
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_LOG4J_ROOT_LOGLEVEL: 'WARN'
+      KAFKA_LOG4J_LOGGERS: 'org.apache.zookeeper=WARN,org.apache.kafka=WARN,kafka=WARN,state.change.logger=WARN'
     networks:
       - test-network
 
