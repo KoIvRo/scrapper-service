@@ -1,5 +1,7 @@
 FROM python:3.12-slim AS app
 
+WORKDIR /app
+
 ENV POETRY_HOME="/opt/poetry" \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_NO_INTERACTION=1 \
@@ -8,16 +10,18 @@ ENV POETRY_HOME="/opt/poetry" \
 
 ENV PATH="$POETRY_HOME/bin:$PATH"
 
-RUN apt-get update && apt-get install -y curl
-RUN curl -sSL https://install.python-poetry.org | python -
+RUN apt-get update &&\
+    apt-get install -y curl &&\
+    curl -sSL https://install.python-poetry.org | python - &&\
+    useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 
-WORKDIR /app
-
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml poetry.lock /app
 RUN poetry install --no-root --with main
 
 COPY src /app/src
 COPY config.yml /app
+
+USER appuser
 
 WORKDIR /app/src
 
