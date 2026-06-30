@@ -17,13 +17,6 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
-.env
-*.env
-.env.*
-secrets.json
-*.pem
-*.key
-
 .vscode/
 .idea/
 *.swp
