@@ -1,7 +1,7 @@
 image: python:3.12-slim
 
 variables:
-  P_LANG: "python" # Default value, may be overridden via GitLab CI/CD UI
+  P_LANG: "python"
 
 stages:
   - pre
