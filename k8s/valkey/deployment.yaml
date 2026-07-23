@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: valkey
+  namespace: link-tracker
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: valkey
+
+  template:
+    metadata:
+      labels:
+        app: valkey
+
+    spec:
+      containers:
+        - name: valkey
+          image: valkey/valkey:latest
+
+          command:
+            - valkey-server
+            - --port
+            - "6379"
+            - --appendonly
+            - "yes"
+
+          ports:
+            - containerPort: 6379
+
+          volumeMounts:
+            - name: valkey-storage
+              mountPath: /data
+
+      volumes:
+        - name: valkey-storage
+          hostPath:
+            path: /data/valkey
+            type: DirectoryOrCreate

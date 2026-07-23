@@ -24,3 +24,5 @@ dmypy.json
 **/.benchmarks/
 
 **/.env
+
+**/secret.yaml
